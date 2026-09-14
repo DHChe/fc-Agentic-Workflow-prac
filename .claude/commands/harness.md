@@ -134,6 +134,7 @@ npm test        # 테스트 통과
 ```bash
 python3 scripts/execute.py {task-name}        # 순차 실행
 python3 scripts/execute.py {task-name} --push  # 실행 후 push
+# Vercel 자동 배포: 미리 `vercel login && vercel link` 해 두면 step마다 preview, 완료 시 production
 ```
 
 execute.py가 자동으로 처리하는 것:
@@ -144,6 +145,7 @@ execute.py가 자동으로 처리하는 것:
 - 자가 교정 — 실패 시 최대 3회 재시도하며, 이전 에러 메시지를 프롬프트에 피드백
 - 2단계 커밋 — 코드 변경(`feat`)과 메타데이터(`chore`)를 분리 커밋
 - 타임스탬프 — started_at, completed_at, failed_at, blocked_at 자동 기록
+- Vercel 자동 배포 — `.vercel/project.json`과 `vercel` CLI가 있으면 step 완료마다 preview 배포(`preview_url` 기록), phase 완료 시 production 배포. 미연결이면 건너뜀
 
 에러 복구:
 

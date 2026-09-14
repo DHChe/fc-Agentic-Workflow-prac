@@ -4,12 +4,16 @@ Harness Step Executor — phase 내 step을 순차 실행하고 자가 교정한
 
 Usage:
     python3 scripts/execute.py <phase-dir> [--push]
+
+Vercel 자동 배포 (ADR-009): 루트에 .vercel/project.json이 있고 vercel CLI가 있으면
+step 완료마다 preview 배포, phase 완료 시 production 배포. 없으면 건너뛴다.
 """
 
 import argparse
 import contextlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import threading
@@ -156,6 +160,50 @@ class StepExecutor:
             if r.returncode != 0:
                 print(f"  WARN: housekeeping 커밋 실패: {r.stderr.strip()}")
 
+    # --- vercel (ADR-009) ---
+
+    def _run_vercel(self, *args) -> subprocess.CompletedProcess:
+        cmd = ["vercel"] + list(args)
+        return subprocess.run(cmd, cwd=self._root, capture_output=True, text=True, timeout=900)
+
+    def _vercel_linked(self) -> bool:
+        linked = (Path(self._root) / ".vercel" / "project.json").exists()
+        return linked and shutil.which("vercel") is not None
+
+    @staticmethod
+    def _last_url(stdout: str) -> str:
+        urls = [tok for tok in stdout.split() if tok.startswith("https://")]
+        return urls[-1] if urls else stdout.strip()
+
+    def _deploy_step(self, step_num: int) -> Optional[str]:
+        """step 완료 후 preview 배포. 미연결이면 건너뛰고, 실패는 경고만 남긴다."""
+        if not self._vercel_linked():
+            return None
+        r = self._run_vercel("deploy", "--yes")
+        if r.returncode != 0:
+            print(f"  WARN: preview 배포 실패: {r.stderr.strip()[:300]}")
+            return None
+        url = self._last_url(r.stdout)
+        index = self._read_json(self._index_file)
+        for s in index["steps"]:
+            if s["step"] == step_num:
+                s["preview_url"] = url
+        self._write_json(self._index_file, index)
+        print(f"  ▲ Preview: {url}")
+        return url
+
+    def _deploy_production(self) -> Optional[str]:
+        """phase 완료 후 production 배포. 미연결이면 건너뛰고, 실패는 중단한다."""
+        if not self._vercel_linked():
+            return None
+        r = self._run_vercel("deploy", "--prod", "--yes")
+        if r.returncode != 0:
+            print(f"\n  ERROR: production 배포 실패: {r.stderr.strip()[:300]}")
+            sys.exit(1)
+        url = self._last_url(r.stdout)
+        print(f"  ▲ Production: {url}")
+        return url
+
     # --- top-level index ---
 
     def _update_top_index(self, status: str):
@@ -264,6 +312,10 @@ class StepExecutor:
         print(f"  Phase: {self._phase_name} | Steps: {self._total}")
         if self._auto_push:
             print(f"  Auto-push: enabled")
+        if self._vercel_linked():
+            print(f"  Auto-deploy: enabled (vercel linked)")
+        else:
+            print(f"  Auto-deploy: skipped (.vercel/project.json 또는 vercel CLI 없음)")
         print(f"{'='*60}")
 
     def _check_blockers(self):
@@ -318,6 +370,7 @@ class StepExecutor:
                     if s["step"] == step_num:
                         s["completed_at"] = ts
                 self._write_json(self._index_file, index)
+                self._deploy_step(step_num)
                 self._commit_step(step_num, step_name)
                 print(f"  ✓ Step {step_num}: {step_name} [{elapsed}s]")
                 return True
@@ -390,6 +443,8 @@ class StepExecutor:
             r = self._run_git("commit", "-m", msg)
             if r.returncode == 0:
                 print(f"  ✓ {msg}")
+
+        self._deploy_production()
 
         if self._auto_push:
             branch = f"feat-{self._phase_name}"

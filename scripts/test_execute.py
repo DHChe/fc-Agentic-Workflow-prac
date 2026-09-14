@@ -557,3 +557,99 @@ class TestCheckBlockers:
         with pytest.raises(SystemExit) as exc_info:
             inst._check_blockers()
         assert exc_info.value.code == 2
+
+
+# ---------------------------------------------------------------------------
+# Vercel 자동 배포 (ADR-009): step 완료마다 preview, phase 완료 시 production
+# ---------------------------------------------------------------------------
+
+class TestVercelDeploy:
+    def _link(self, tmp_project):
+        (tmp_project / ".vercel").mkdir(exist_ok=True)
+        (tmp_project / ".vercel" / "project.json").write_text('{"orgId": "o", "projectId": "p"}')
+
+    def test_not_linked_skips_without_calling_vercel(self, executor):
+        executor._run_vercel = MagicMock()
+        with patch("shutil.which", return_value="/usr/local/bin/vercel"):
+            assert executor._deploy_step(2) is None
+        executor._run_vercel.assert_not_called()
+
+    def test_cli_missing_skips_even_if_linked(self, executor, tmp_project):
+        self._link(tmp_project)
+        executor._run_vercel = MagicMock()
+        with patch("shutil.which", return_value=None):
+            assert executor._deploy_step(2) is None
+        executor._run_vercel.assert_not_called()
+
+    def test_preview_deploy_records_url_in_index(self, executor, tmp_project):
+        self._link(tmp_project)
+        calls = []
+        def fake_vercel(*args):
+            calls.append(args)
+            return MagicMock(returncode=0, stdout="Inspect: https://vercel.com/x/y\nhttps://app-abc123.vercel.app\n", stderr="")
+        executor._run_vercel = fake_vercel
+        with patch("shutil.which", return_value="/usr/local/bin/vercel"):
+            url = executor._deploy_step(2)
+        assert url == "https://app-abc123.vercel.app"
+        assert calls == [("deploy", "--yes")]
+        index = json.loads(executor._index_file.read_text())
+        step2 = next(s for s in index["steps"] if s["step"] == 2)
+        assert step2["preview_url"] == url
+
+    def test_preview_failure_is_warning_not_exit(self, executor, tmp_project):
+        self._link(tmp_project)
+        executor._run_vercel = MagicMock(return_value=MagicMock(returncode=1, stdout="", stderr="build failed"))
+        with patch("shutil.which", return_value="/usr/local/bin/vercel"):
+            assert executor._deploy_step(2) is None  # SystemExit이 나면 안 된다
+        index = json.loads(executor._index_file.read_text())
+        step2 = next(s for s in index["steps"] if s["step"] == 2)
+        assert "preview_url" not in step2
+
+    def test_production_deploy_uses_prod_flag(self, executor, tmp_project):
+        self._link(tmp_project)
+        calls = []
+        def fake_vercel(*args):
+            calls.append(args)
+            return MagicMock(returncode=0, stdout="https://slipscan.vercel.app\n", stderr="")
+        executor._run_vercel = fake_vercel
+        with patch("shutil.which", return_value="/usr/local/bin/vercel"):
+            url = executor._deploy_production()
+        assert url == "https://slipscan.vercel.app"
+        assert calls == [("deploy", "--prod", "--yes")]
+
+    def test_production_failure_exits_1(self, executor, tmp_project):
+        self._link(tmp_project)
+        executor._run_vercel = MagicMock(return_value=MagicMock(returncode=1, stdout="", stderr="boom"))
+        with patch("shutil.which", return_value="/usr/local/bin/vercel"):
+            with pytest.raises(SystemExit) as exc_info:
+                executor._deploy_production()
+        assert exc_info.value.code == 1
+
+    def test_production_not_linked_is_noop(self, executor):
+        executor._run_vercel = MagicMock()
+        with patch("shutil.which", return_value="/usr/local/bin/vercel"):
+            assert executor._deploy_production() is None
+        executor._run_vercel.assert_not_called()
+
+    def test_completed_step_deploys_preview_before_commit(self, executor):
+        order = []
+        def fake_invoke(step, preamble):
+            index = json.loads(executor._index_file.read_text())
+            for s in index["steps"]:
+                if s["step"] == step["step"]:
+                    s["status"] = "completed"
+                    s["summary"] = "done"
+            executor._index_file.write_text(json.dumps(index))
+            return {}
+        executor._invoke_claude = fake_invoke
+        executor._deploy_step = lambda n: order.append(("deploy", n))
+        executor._commit_step = lambda n, name: order.append(("commit", n))
+        assert executor._execute_single_step({"step": 2, "name": "ui"}, "") is True
+        assert order == [("deploy", 2), ("commit", 2)]
+
+    def test_finalize_deploys_production(self, executor, top_index):
+        executor._top_index_file = top_index
+        executor._run_git = MagicMock(return_value=MagicMock(returncode=0, stdout="", stderr=""))
+        executor._deploy_production = MagicMock(return_value="https://slipscan.vercel.app")
+        executor._finalize()
+        executor._deploy_production.assert_called_once()
