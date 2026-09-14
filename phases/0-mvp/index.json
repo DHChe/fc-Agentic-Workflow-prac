@@ -1,0 +1,66 @@
+{
+  "project": "SlipScan",
+  "phase": "0-mvp",
+  "steps": [
+    {
+      "step": 0,
+      "name": "project-setup",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "core-types",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "supabase-layer",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "auth-flow",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "claude-analyzer",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "analysis-api",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "dashboard-pages",
+      "status": "pending"
+    },
+    {
+      "step": 7,
+      "name": "upload-flow",
+      "status": "pending"
+    },
+    {
+      "step": 8,
+      "name": "edit-flow",
+      "status": "pending"
+    },
+    {
+      "step": 9,
+      "name": "csv-export",
+      "status": "pending"
+    },
+    {
+      "step": 10,
+      "name": "landing-page",
+      "status": "pending"
+    },
+    {
+      "step": 11,
+      "name": "deploy-docs",
+      "status": "pending"
+    }
+  ]
+}
