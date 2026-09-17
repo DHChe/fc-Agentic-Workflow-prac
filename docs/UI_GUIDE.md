@@ -1,10 +1,10 @@
 # UI 디자인 가이드
 
-색상, 컴포넌트, 레이아웃, 타이포그래피, 아이콘 규칙은 Claude Design 산출물 `docs/design.md`에서 확정한다(하네스 실행기가 `docs/*.md`만 매 step에 넣어 주므로 위치는 `docs/`다). 확정 전까지 이 문서의 규칙은 아래 두 가지만이다.
+색상, 컴포넌트, 레이아웃, 타이포그래피, 아이콘 규칙은 Claude Design 산출물 `docs/design.md`에서 확정했다(하네스 실행기가 `docs/*.md`만 매 step에 넣어 주므로 위치는 `docs/`다). 이 문서에는 테마 규칙과 금지 목록만 둔다.
 
 ## 테마
-- 기기의 라이트/다크 설정을 따른다(`prefers-color-scheme`). 앱 안에 전환 버튼은 없다 (ARCHITECTURE ADR-16).
-- 색은 shadcn/ui 토큰(`bg-background`, `text-foreground`, `text-muted-foreground` 등)만 쓴다. 컴포넌트에 `dark:` 접두어를 직접 붙이지 않는다.
+- 라이트만 쓴다. 기기의 다크 설정을 따르지 않고 앱 안에 전환 버튼도 없다 (ARCHITECTURE ADR-16). `dark:` 접두어를 쓰지 않는다.
+- 색은 `docs/design.md` 3절의 토큰(shadcn/ui 이름 + 확장 토큰)만 쓴다. 컴포넌트에 색 값(#…)을 직접 쓰지 않는다.
 
 ## AI 슬롭 안티패턴 — 하지 마라
 | 금지 사항 | 이유 |
