@@ -7,3 +7,20 @@ tsconfig.tsbuildinfo
 # phase execution outputs
 phases/**/phase*-output.json
 phases/**/step*-output.json
+
+# harness / tooling state
+.omc/
+__pycache__/
+
+# env (값이 든 파일은 절대 커밋하지 않는다)
+.env*
+!.env.example
+
+# vercel cli link
+.vercel
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
+
+# personal local overrides for Claude Code (statusline, etc.) — not shared with team
+.claude/settings.local.json
