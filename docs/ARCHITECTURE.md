@@ -6,7 +6,7 @@
 | 작성일 | 2026-09-16 |
 | 짝 문서 | `docs/PRD.md` (무엇을 만드는가), `docs/USER_FLOWS.md` (누가 어떤 순서로, 문구). 이 문서는 어떻게 만드는가 |
 | 상태 | 확정. 구현 전. 이 브랜치의 설계 기준(SOT) |
-| 개정 | 2026-09-16: v1 계획과 비교해 충돌 항목 정리. 12절 ADR-12, 15~17과 3절 Next 16 행, 7.1 호출 설정, 8절 에러 응답 규약 추가<br/>2026-09-16 (2차): USER_FLOWS.md 결정 반영. 5.1 암호 PDF, 5.2 폴링 규칙, 5.3 오늘 날짜 입력, 5.4 기본 기간, 7.2 프롬프트 규칙, 10절 DEMO_USER_ID, 11절 시드·Clerk 설정, ADR-18~21, 13절 확인 항목<br/>2026-09-17: v1 브랜치(`feat/mvp-plan-vercel-deploy`) 전수 대조. 5.1 이미지 축소·업로드 URL 검증, 5.7 응답 헤더, ADR-22, 13절 확인 항목 2개<br/>2026-09-17 (2차): 세 모델(Claude·Codex·Grok) 교차 리뷰 반영. 시연 5분 여정(J1) 기준으로 범위 축소, 결함 수정(사용량 기록, 업로드 경로 검증, 트랜잭션, stop_reason, 날짜·시간대 등). 이 문서에서는 4절 디렉토리, 5.1~5.7, 6절 스키마(`usage_log` 추가)·카테고리 8개, 7절 호출 설정, 8절 API 9개·실패 원인 표, 9절 테스트, 10절 환경변수 8개, 11절 시드, ADR-1·9·10·13·19·21 개정과 ADR-23~27 추가, 13절 확인 항목 |
+| 개정 | 2026-09-16: v1 계획과 비교해 충돌 항목 정리. 12절 ADR-12, 15~17과 3절 Next 16 행, 7.1 호출 설정, 8절 에러 응답 규약 추가<br/>2026-09-16 (2차): USER_FLOWS.md 결정 반영. 5.1 암호 PDF, 5.2 폴링 규칙, 5.3 오늘 날짜 입력, 5.4 기본 기간, 7.2 프롬프트 규칙, 10절 DEMO_USER_ID, 11절 시드·Clerk 설정, ADR-18~21, 13절 확인 항목<br/>2026-09-17: v1 브랜치(`feat/mvp-plan-vercel-deploy`) 전수 대조. 5.1 이미지 축소·업로드 URL 검증, 5.7 응답 헤더, ADR-22, 13절 확인 항목 2개<br/>2026-09-17 (2차): 세 모델(Claude·Codex·Grok) 교차 리뷰 반영. 시연 5분 여정(J1) 기준으로 범위 축소, 결함 수정(사용량 기록, 업로드 경로 검증, 트랜잭션, stop_reason, 날짜·시간대 등). 이 문서에서는 4절 디렉토리, 5.1~5.7, 6절 스키마(`usage_log` 추가)·카테고리 8개, 7절 호출 설정, 8절 API 9개·실패 원인 표, 9절 테스트, 10절 환경변수 8개, 11절 시드, ADR-1·9·10·13·19·21 개정과 ADR-23~27 추가, 13절 확인 항목<br/>2026-09-17 (3차): 서비스 생성 때 정한 리전(싱가포르 `sin1`) 기록. 3절 리전 제약 행, 11절 리전 항목, ADR-28 |
 
 기능 범위·제한값·예외 규칙의 출처는 PRD다. 두 문서가 어긋나면 PRD를 고치고 이 문서를 따라 맞춘다.
 
@@ -64,6 +64,7 @@ flowchart LR
 | Claude API | PDF 요청 32MB, 페이지마다 이미지로 과금 | 20페이지 제한 |
 | Clerk 무료 | 초대 전용 모드 + 초대 발송 무료. 허용 목록(allowlist) 기능은 유료 | 초대는 Clerk 대시보드에서 보낸다. 앱 안에 초대 화면을 두지 않는다 |
 | Neon 무료 | 프로젝트당 0.5GB, 100 CU-시간/월 | 시연 규모에 충분 |
+| Vercel Blob · Neon | 리전은 생성 후 바꿀 수 없다. Neon의 아시아 리전은 싱가포르·시드니뿐이다(2026-09-17 확인) | 앱 서버·Blob·Neon을 모두 싱가포르 `sin1`에 둔다(11절, ADR-28) |
 | iOS Safari | HEIC → JPG 자동 변환은 공식 문서로 확인되지 않음 | HEIC 미지원. 아이폰에서 고른 사진이 JPG로 넘어오는지는 수동 확인(9.3). 그대로 넘어오면 형식 오류 문구로 막힌다 |
 | Next.js 16 | `middleware.ts`가 `proxy.ts`로 바뀜. `cookies()`·`params`·`searchParams`는 Promise. `next lint` 제거 | 라우트 가드는 `proxy.ts`에. 서버 컴포넌트에서 `await params`. lint는 ESLint를 직접 실행 |
 
@@ -468,6 +469,7 @@ ExtractionResult = {
 ## 11. 배포와 운영
 
 - Vercel 프로젝트 1개(Hobby). GitHub `main` 머지 시 자동 배포. PR은 프리뷰 배포. 하네스 실행기(`scripts/execute.py`)는 배포에 관여하지 않는다.
+- 리전: 앱 서버(Vercel 함수), Blob 스토어 `slipscan-files`, Neon `slipscan-demo`·`slipscan-test`를 모두 싱가포르 `sin1`에 둔다(ADR-28). 함수 리전은 `vercel.json`이 아니라 Vercel 프로젝트 설정(Settings → Functions → Function Regions)에 `sin1`로 저장되어 있다. Blob과 Neon은 이미 `sin1`에 만들어져 있고 리전을 바꿀 수 없다.
 - step 0 체크리스트: Vercel 프로젝트의 Framework Preset을 Next.js로, Node를 22로 맞춘다(`.nvmrc`와 일치). 기존 Vercel 환경변수(v1 흔적)는 10절 이름으로 교체한다.
 - Clerk: 개발 인스턴스(로컬·테스트)와 운영 인스턴스(Vercel) 분리. 운영 인스턴스는 Restricted 모드, 이메일/비밀번호만, 사용자 계정 삭제 기능 끔(13절).
 - Neon: 시연용 프로젝트 1개, 테스트용 프로젝트 1개.
@@ -514,6 +516,7 @@ ExtractionResult = {
 | ADR-25 | 대시보드 조회 API는 `GET /api/dashboard` 하나(사용량 + 월 통계 + 문서 목록) | 목록·통계·사용량 API 3개 | 폴링이 요청 1개가 되고 세 값이 같은 시점의 것이 된다 |
 | ADR-26 | 보고서 완료 판정은 `X-Report-Id` 헤더 + 스트림 종료 후 status 조회. NDJSON 규약 없음 | 스트림을 `text`/`done`/`error` 이벤트로 나누는 NDJSON | 일반 텍스트 스트림을 그대로 두고 조회 1번으로 같은 판정을 얻는다. 서버는 DB 저장 뒤에 스트림을 닫는다 |
 | ADR-27 | Claude 호출은 `maxRetries: 0` + `stop_reason` 검사(`end_turn`만 정상) | SDK 기본 재시도(2회), `stop_reason` 미검사 | 240초 타임아웃 × 재시도가 함수 300초를 넘는다. `refusal`·`max_tokens`는 HTTP 200이라 검사하지 않으면 스키마 실패나 잘린 결과로 흘러간다 |
+| ADR-28 | 리전은 싱가포르 `sin1`로 통일한다(Vercel 함수·Blob·Neon 시연용과 테스트용) | 미국 동부 `iad1`(Vercel 기본값) | 화면이 한국어이고 날짜 기준이 Asia/Seoul이라 사용자와 심사자는 한국에 있다. Vercel 마켓플레이스의 Neon이 고를 수 있는 리전(cle1·iad1·pdx1·fra1·lhr1·syd1·sin1·gru1) 중 한국에서 가장 가깝다. 함수와 DB가 떨어져 있으면 DB 질의마다 왕복 지연이 붙으므로 셋을 한곳에 둔다. `iad1`은 추가 설정이 없지만 한국에서 요청마다 대략 200ms가 걸린다(싱가포르는 대략 70ms). Blob·Neon 리전은 생성 후 바꿀 수 없다(3절). 2026-09-17 서비스 생성 때 사용자 결정 |
 
 ## 13. 구현 시 확인할 것
 
