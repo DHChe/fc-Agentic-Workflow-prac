@@ -229,7 +229,6 @@ export function useReportGeneration(opts: { onFinished: () => void }): {
 }
 
 export function ReportCreateButton(props: {
-  month: string;
   count: number;
   limitReached: boolean;
   generating: boolean;

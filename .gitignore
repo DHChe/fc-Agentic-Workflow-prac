@@ -53,3 +53,4 @@ yarn-error.log*
 cypress.env.json
 cypress/videos
 cypress/screenshots
+cypress/downloads

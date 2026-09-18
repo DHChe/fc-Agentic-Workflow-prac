@@ -45,7 +45,6 @@ export default function DashboardPage(): React.JSX.Element {
             count={transactionCount}
             generating={generating}
             limitReached={limitReached}
-            month={month ?? ""}
             onCreate={createReport}
           />
         }
