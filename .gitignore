@@ -22,5 +22,8 @@ __pycache__/
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
 
+# graft hook helpers — generated per machine with an absolute local install path baked in
+.claude/helpers/
+
 # personal local overrides for Claude Code (statusline, etc.) — not shared with team
 .claude/settings.local.json
