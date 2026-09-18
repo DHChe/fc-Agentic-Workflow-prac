@@ -6,7 +6,10 @@ import { pathToFileURL } from "node:url";
 import { del, put } from "@vercel/blob";
 import { and, count, eq } from "drizzle-orm";
 
-import { REPORT_SECTION_TITLES } from "@/lib/claude/report";
+import {
+  REPORT_SECTION_TITLES,
+  UNKNOWN_MERCHANT,
+} from "@/lib/claude/report";
 import { CATEGORY_LABELS, type CategoryKey } from "@/lib/categories";
 import { getDb } from "@/lib/db/client";
 import {
@@ -101,14 +104,14 @@ export function buildSeedReport(augustRows: SeedReportRow[]): string {
   );
   const top5Lines = top5.map(
     (transaction) =>
-      `- ${formatDate(transaction.transactedAt)} ${transaction.merchantName ?? "가맹점 미인식"}: ${formatAmount(transaction.totalAmount)} · ${CATEGORY_LABELS[transaction.category]}`,
+      `- ${formatDate(transaction.transactedAt)} ${transaction.merchantName ?? UNKNOWN_MERCHANT}: ${formatAmount(transaction.totalAmount)} · ${CATEGORY_LABELS[transaction.category]}`,
   );
   const observations = [
     largestCategory
       ? `- 가장 큰 카테고리는 ${CATEGORY_LABELS[largestCategory.key]}이며 ${formatAmount(largestCategory.amount)}으로 전체의 ${formatRatio(largestCategory.ratio)}입니다.`
       : "- 집계된 카테고리가 없습니다.",
     largestTransaction
-      ? `- 가장 큰 지출은 ${largestTransaction.merchantName ?? "가맹점 미인식"}의 ${formatAmount(largestTransaction.totalAmount)}입니다.`
+      ? `- 가장 큰 지출은 ${largestTransaction.merchantName ?? UNKNOWN_MERCHANT}의 ${formatAmount(largestTransaction.totalAmount)}입니다.`
       : "- 집계된 거래가 없습니다.",
     refunds.length > 0
       ? `- 취소·환불 ${refunds.length}건, ${formatAmount(refundTotal)}이 순지출에 반영되었습니다.`

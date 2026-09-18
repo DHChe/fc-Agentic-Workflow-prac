@@ -17,6 +17,8 @@ import { REPORT_SYSTEM_PROMPT } from "./prompts/report";
 const TEST_CHUNK_DELAY_MS = 50;
 const STALE_REPORT_MILLISECONDS = 10 * 60 * 1_000;
 
+export const UNKNOWN_MERCHANT = "가맹점 미인식";
+
 export const REPORT_SECTION_TITLES = [
   "1. 기간 총 지출액과 거래 건수",
   "2. 카테고리별 금액·비율",
@@ -92,10 +94,12 @@ export function buildReportInput(
       category: row.category,
     })),
   );
-  const categories = stats.categories.map((category) => ({
-    ...category,
-    label: CATEGORY_LABELS[category.key],
-  }));
+  const categories = stats.categories
+    .filter((category) => category.amount !== 0)
+    .map((category) => ({
+      ...category,
+      label: CATEGORY_LABELS[category.key],
+    }));
   const top5 = [...rows]
     .sort(
       (left, right) =>
@@ -105,7 +109,7 @@ export function buildReportInput(
     .slice(0, 5)
     .map((row) => ({
       date: seoulDateKey(row.transactedAt),
-      merchant: row.merchantName ?? MESSAGES.label.placeholder,
+      merchant: row.merchantName ?? UNKNOWN_MERCHANT,
       amount: row.totalAmount,
       category: CATEGORY_LABELS[row.category],
     }));
@@ -119,7 +123,7 @@ export function buildReportInput(
   const transactionLines = rows.map((row) =>
     [
       `날짜·시각: ${formatDateTime(row.transactedAt)}`,
-      `가맹점: ${row.merchantName ?? MESSAGES.label.placeholder}`,
+      `가맹점: ${row.merchantName ?? UNKNOWN_MERCHANT}`,
       `금액: ${formatAmount(row.totalAmount)}`,
       `카테고리: ${CATEGORY_LABELS[row.category]}`,
       `카드 끝4: ${row.cardLast4 ?? MESSAGES.label.placeholder}`,
