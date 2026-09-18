@@ -90,6 +90,8 @@ return new Response(body, { headers })
 
 ### 테스트 (먼저 쓴다. 네트워크·DB 없음)
 
+테스트를 쓰고 실패를 확인한 직후, 구현을 시작하기 전에 테스트 파일만 지정해서 커밋한다: `git add lib/claude/report.test.ts && git commit -m "test(2-reports-demo): step 1 — reports-api"`. `git add -A`를 쓰지 않는다(추적하지 않는 도구 파일이 딸려 들어간다). 구현은 하네스가 step 끝에 `feat(...)`로 커밋하므로, 기록에 "실패하는 테스트 → 통과시키는 구현" 순서가 남는다.
+
 - `parseReportRequest`: `{ month: '2026-09' }` 통과 / `2026-13`, `2026-9`, 숫자, 빈 객체, null, 배열 → null.
 - `toReportErrorResponse`: `RateLimitError` → 502 / 상태 503인 `APIError` → 502 / `APIConnectionTimeoutError` → 502 / fixture `fail-api`가 던지는 오류 → 502 / 일반 `Error` → 500 / 문자열 → 500. 문장은 `MESSAGES.api.upstream`·`MESSAGES.api.internal`과 같다.
 - 라우트 핸들러를 네트워크로 테스트하지 않는다.

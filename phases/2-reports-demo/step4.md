@@ -75,6 +75,8 @@ design.md 12.2 기준 기대값: 문서 10건(영수증 9 + 카드명세서 1), 
 
 ### 테스트 (먼저 쓴다. `scripts/seed-demo.test.ts`. DB·Blob 없음)
 
+테스트를 쓰고 실패를 확인한 직후, 구현을 시작하기 전에 테스트 파일만 지정해서 커밋한다: `git add scripts/seed-demo.test.ts && git commit -m "test(2-reports-demo): step 4 — demo-seed"`. `git add -A`를 쓰지 않는다(추적하지 않는 도구 파일이 딸려 들어간다). 구현은 하네스가 step 끝에 `feat(...)`로 커밋하므로, 기록에 "실패하는 테스트 → 통과시키는 구현" 순서가 남는다.
+
 - `planSeed`: 문서 10건, 거래 14건 / 모든 행의 `userId`가 넘긴 값이다 / `isDuplicate`인 거래가 정확히 1건이고 그 `duplicateOf`가 7번 문서의 09-03 23,000원 줄이며 그 줄의 `createdAt`이 더 이르다 / `dateEstimated`가 정확히 1건 / 모든 `blobPathname`이 `validateUploadPath(pathname, demoUserId)`를 통과한다 / id가 모두 서로 다르고 두 번 불러도 같은 결과다.
 - `buildSeedReport`: 5개 제목이 `## `로 순서대로 있다 / 8월 총액이 시드 데이터에서 계산한 값(중복·미인식 제외)과 같고 `formatAmount` 표기로 본문에 들어 있다 / `](`와 `|---`가 없다.
 

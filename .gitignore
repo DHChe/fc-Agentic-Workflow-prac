@@ -48,3 +48,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+
+# cypress (e2e). cypress.env.json은 테스트 계정 비밀번호를 담는다
+cypress.env.json
+cypress/videos
+cypress/screenshots
