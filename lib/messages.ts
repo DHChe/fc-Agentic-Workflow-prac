@@ -136,6 +136,8 @@ export const MESSAGES = {
     documentTotalDescription:
       "추출된 금액의 합입니다. 중복으로 표시된 거래도 포함합니다.",
     statsDescription: "금액 미인식과 중복 거래는 뺐습니다.",
+    previousMonth: "이전 달 보기",
+    nextMonth: "다음 달 보기",
     transactionCount: (count: number) => `거래 ${count}건`,
     modelUsed: "사용 모델",
     dashboard: "대시보드",

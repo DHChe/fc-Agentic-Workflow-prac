@@ -3,6 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 import type * as React from "react";
 
 import { AppHeader } from "@/components/app-header";
+import { DashboardDataProvider } from "@/components/dashboard/dashboard-data";
+import { UsageCounter } from "@/components/dashboard/usage-counter";
 import { Button } from "@/components/ui/button";
 import { MESSAGES } from "@/lib/messages";
 
@@ -24,11 +26,11 @@ export default async function DashboardLayout(props: {
   );
 
   return (
-    <>
-      <AppHeader userMenu={userMenu} />
+    <DashboardDataProvider>
+      <AppHeader usage={<UsageCounter />} userMenu={userMenu} />
       <main className="mx-auto w-full max-w-[1180px] px-5 py-7 md:px-6">
         {props.children}
       </main>
-    </>
+    </DashboardDataProvider>
   );
 }
