@@ -93,7 +93,10 @@
     {
       "step": 11,
       "name": "upload-ui",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T20:52:51+0900",
+      "summary": "UploadPanel(props 없음)로 파일 선택·Blob 직접 업로드·문서 생성·샘플 업로드·진행률·실패 후 사용량 재확인을 구현; upload-helpers.ts exports: buildUploadPath, pickUploadError; data-testid: upload-input, upload-submit, upload-sample, upload-error, upload-progress, limit-notice; MESSAGES.ui 추가 없음(기존 uploadPrompt, uploadLimits, uploadDone 사용)",
+      "completed_at": "2026-09-18T20:57:35+0900"
     },
     {
       "step": 12,
