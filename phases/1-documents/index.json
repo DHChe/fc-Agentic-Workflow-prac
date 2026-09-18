@@ -40,7 +40,7 @@
       "status": "completed",
       "started_at": "2026-09-18T20:09:19+0900",
       "summary": "scripts/generate-samples.ts와 scripts/seed-assets/01.jpg~10.jpg·statement-check.pdf, public/samples/receipt-sample.jpg 생성; SVG에서 Apple SD Gothic Neo를 우선 지정해 세 대표 JPG의 한글·숫자를 직접 확인; npx tsx scripts/generate-samples.ts로 재생성",
-      "completed_at": "2026-09-18T20:14:24+0900"
+      "completed_at": "2026-09-18T20:15:14+0900"
     },
     {
       "step": 5,
