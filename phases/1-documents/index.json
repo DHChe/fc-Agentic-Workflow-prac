@@ -5,7 +5,9 @@
     {
       "step": 0,
       "name": "date-and-stats-lib",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T19:48:29+0900",
+      "summary": "lib/stats/aggregate.ts와 lib/stats/aggregate.test.ts 생성; exports: seoulDayStart, seoulDateKey, currentSeoulMonth, isValidMonth, monthRange, shiftMonth, parseTransactedAt, StatRow, MonthStats, aggregateMonth, pickDefaultMonth, getMonthStats, getDefaultMonth, countReportableTransactions"
     },
     {
       "step": 1,
@@ -72,5 +74,6 @@
       "name": "document-detail-ui",
       "status": "pending"
     }
-  ]
+  ],
+  "created_at": "2026-09-18T19:48:29+0900"
 }
