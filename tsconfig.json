@@ -33,6 +33,8 @@
   "exclude": [
     ".next",
     "node_modules",
+    "cypress",
+    "cypress.config.ts",
     "graft",
     "phases",
     "scripts/__pycache__",

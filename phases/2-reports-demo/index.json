@@ -45,7 +45,9 @@
     {
       "step": 5,
       "name": "e2e-setup",
-      "status": "pending"
+      "status": "error",
+      "started_at": "2026-09-18T23:30:02+0900",
+      "error_message": "npm run e2e:limit에서 @clerk/testing의 cy.clerkSignIn이 오류 없이 반환했지만 window.Clerk.session이 null로 남아 /dashboard 인증에 실패함. 세션 대기, /sign-in 선방문, setupClerkTestingToken 선등록까지 3회 수정 후에도 동일하게 재현됨"
     },
     {
       "step": 6,
