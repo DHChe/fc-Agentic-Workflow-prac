@@ -19,6 +19,15 @@ export default defineConfig({
     specPattern: "cypress/e2e/**/*.cy.ts",
     supportFile: "cypress/support/e2e.ts",
     async setupNodeEvents(on, config) {
+      on("before:browser:launch", (browser, launchOptions) => {
+        if (browser.family === "chromium" && browser.name !== "electron") {
+          launchOptions.args.push(
+            "--disable-features=FetchUploadStreaming",
+          );
+        }
+
+        return launchOptions;
+      });
       on("task", { resetUser, fillUsage });
       config.env.BLOB_STORE_HOST = getBlobStoreHost();
 

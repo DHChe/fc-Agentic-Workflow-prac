@@ -39,18 +39,24 @@ Cypress.Commands.add("signInAsTestUser", () => {
   const identifier = requiredEnv("E2E_USER_EMAIL");
   const password = requiredEnv("E2E_USER_PASSWORD");
 
-  cy.visit("/");
-  cy.clerkLoaded();
-  cy.clerkSignIn({ strategy: "password", identifier, password });
-  cy.window().should((window) => {
-    if (window.Clerk.client?.signIn.status === "needs_client_trust") {
-      throw new Error(
-        "Clerk Device Trust must be disabled for the development E2E instance",
-      );
-    }
+  cy.session(
+    ["clerk-test-user", identifier],
+    () => {
+      cy.visit("/");
+      cy.clerkLoaded();
+      cy.clerkSignIn({ strategy: "password", identifier, password });
+      cy.window().should((window) => {
+        if (window.Clerk.client?.signIn.status === "needs_client_trust") {
+          throw new Error(
+            "Clerk Device Trust must be disabled for the development E2E instance",
+          );
+        }
 
-    expect(window.Clerk.session).not.to.equal(null);
-  });
+        expect(window.Clerk.session).not.to.equal(null);
+      });
+    },
+    { cacheAcrossSpecs: true },
+  );
   cy.visit("/dashboard");
 });
 

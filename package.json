@@ -7,7 +7,7 @@
     "build": "next build",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "e2e": "start-server-and-test \"SLIPSCAN_TEST_MODE=1 next dev -p 3100\" http://localhost:3100 \"cypress run\"",
+    "e2e": "start-server-and-test \"SLIPSCAN_TEST_MODE=1 next dev -p 3100\" http://localhost:3100 \"cypress run --browser chrome\"",
     "e2e:limit": "start-server-and-test \"SLIPSCAN_TEST_MODE=1 next dev -p 3100\" http://localhost:3100 \"cypress run --spec cypress/e2e/limit.cy.ts\"",
     "e2e:open": "start-server-and-test \"SLIPSCAN_TEST_MODE=1 next dev -p 3100\" http://localhost:3100 \"cypress open\"",
     "seed:demo": "tsx scripts/seed-demo.ts",
