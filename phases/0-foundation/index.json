@@ -31,7 +31,8 @@
       "name": "design-system",
       "status": "completed",
       "started_at": "2026-09-18T18:57:21+0900",
-      "summary": "components/ui/button.tsx의 Button(variant primary·secondary·ghost·danger, size md·sm·xs, asChild), components/ui/badge.tsx의 Badge(tone processing·completed·failed·warn·duplicate), components/panel.tsx의 Panel(children), components/section.tsx의 Section(title·aside·children), components/empty-state.tsx의 EmptyState(icon·text), components/notice-line.tsx의 NoticeLine(tone info·warn·error·children)을 추가하고, 확장 토큰 strong·disabled·sunken·border-soft·border-strong·primary-press·pos·pos-weak·destructive-weak·warn·warn-weak·pos-border·accent-border·destructive-border·warn-border·chart-6~8, text-display·text-h1·text-h2·text-h3·text-body·text-cell·text-caption·text-micro·text-amount-lg·text-amount-md·text-amount-sm 유틸리티, 로컬 Pretendard CSS 변수 --font-pretendard를 구성함"
+      "summary": "components/ui/button.tsx의 Button(variant primary·secondary·ghost·danger, size md·sm·xs, asChild), components/ui/badge.tsx의 Badge(tone processing·completed·failed·warn·duplicate), components/panel.tsx의 Panel(children), components/section.tsx의 Section(title·aside·children), components/empty-state.tsx의 EmptyState(icon·text), components/notice-line.tsx의 NoticeLine(tone info·warn·error·children)을 추가하고, 확장 토큰 strong·disabled·sunken·border-soft·border-strong·primary-press·pos·pos-weak·destructive-weak·warn·warn-weak·pos-border·accent-border·destructive-border·warn-border·chart-6~8, text-display·text-h1·text-h2·text-h3·text-body·text-cell·text-caption·text-micro·text-amount-lg·text-amount-md·text-amount-sm 유틸리티, 로컬 Pretendard CSS 변수 --font-pretendard를 구성함",
+      "completed_at": "2026-09-18T19:06:33+0900"
     },
     {
       "step": 4,
