@@ -24,7 +24,7 @@
       "status": "completed",
       "started_at": "2026-09-18T23:10:13+0900",
       "summary": "ReportMarkdown(markdown, streaming), ReportCreateButton(month, count, limitReached, generating, onCreate), ReportStreamArea(state), useReportGeneration(onFinished)과 reportButtonState를 구현하고, 생성 상태와 reportsReloadKey를 app/dashboard/page.tsx에 두어 통계 버튼·보고서 스트림을 연결했으며 report-create·report-stream·report-status testid를 추가함; MESSAGES.ui에는 새 문장을 더하지 않고 기존 reportGenerating·open을 사용함",
-      "completed_at": "2026-09-18T23:15:15+0900"
+      "completed_at": "2026-09-18T23:16:28+0900"
     },
     {
       "step": 3,
