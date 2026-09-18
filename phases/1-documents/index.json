@@ -1,0 +1,76 @@
+{
+  "project": "SlipScan",
+  "phase": "1-documents",
+  "steps": [
+    {
+      "step": 0,
+      "name": "date-and-stats-lib",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "usage-and-validate-lib",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "claude-schemas-and-fixtures",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "seed-data",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "sample-images",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "pipeline-parts",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "claude-extract",
+      "status": "pending"
+    },
+    {
+      "step": 7,
+      "name": "process-document",
+      "status": "pending"
+    },
+    {
+      "step": 8,
+      "name": "upload-api",
+      "status": "pending"
+    },
+    {
+      "step": 9,
+      "name": "documents-dashboard-api",
+      "status": "pending"
+    },
+    {
+      "step": 10,
+      "name": "dashboard-list-ui",
+      "status": "pending"
+    },
+    {
+      "step": 11,
+      "name": "upload-ui",
+      "status": "pending"
+    },
+    {
+      "step": 12,
+      "name": "stats-ui",
+      "status": "pending"
+    },
+    {
+      "step": 13,
+      "name": "document-detail-ui",
+      "status": "pending"
+    }
+  ]
+}
