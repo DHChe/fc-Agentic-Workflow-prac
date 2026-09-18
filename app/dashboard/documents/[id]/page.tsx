@@ -172,6 +172,7 @@ export default function DocumentDetailPage({
 
   const document = state.document;
   const processing = document.status === "processing";
+  const completed = document.status === "completed";
   const imageOriginal = document.originalMime.startsWith("image/");
   const documentType =
     document.docType === "unknown"
@@ -327,10 +328,12 @@ export default function DocumentDetailPage({
           {processing ? (
             <EmptyState icon={FileText} text={MESSAGES.empty.detailProcessing} />
           ) : document.transactions.length === 0 ? (
-            <EmptyState
-              icon={FileQuestion}
-              text={MESSAGES.empty.detailNoTransactions}
-            />
+            completed ? (
+              <EmptyState
+                icon={FileQuestion}
+                text={MESSAGES.empty.detailNoTransactions}
+              />
+            ) : null
           ) : (
             <TransactionTable transactions={document.transactions} />
           )}

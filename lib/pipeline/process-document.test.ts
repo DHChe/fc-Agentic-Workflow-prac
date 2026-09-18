@@ -8,7 +8,6 @@ import type { ExtractionResult } from "@/lib/claude/schemas";
 import { MESSAGES, type FailureCode } from "@/lib/messages";
 
 import {
-  PROCESSING_TIMEOUT_MS,
   isTimedOut,
   toFailureCode,
   toTransactionRows,
@@ -119,9 +118,9 @@ describe("isTimedOut", () => {
   const uploadedAt = new Date("2026-09-18T00:00:00.000Z");
 
   it.each([
-    [PROCESSING_TIMEOUT_MS - 1_000, false],
-    [PROCESSING_TIMEOUT_MS, false],
-    [PROCESSING_TIMEOUT_MS + 1, true],
+    [599_000, false],
+    [600_000, false],
+    [600_001, true],
   ])("업로드 후 %i ms 경과 시 만료 여부는 %s다", (elapsed, expected) => {
     const now = new Date(uploadedAt.getTime() + elapsed);
 
@@ -202,7 +201,15 @@ describe("toTransactionRows", () => {
   it("기타 문서는 거래 행을 만들지 않는다", () => {
     const result: ExtractionResult = {
       docType: "other",
-      transactions: [],
+      transactions: [
+        {
+          transactedAt: "2026-09-04T12:30:00",
+          merchantName: "결제 취소",
+          totalAmount: -8_900,
+          cardLast4: null,
+          category: "office_equipment",
+        },
+      ],
     };
 
     expect(toTransactionRows(result, context)).toEqual([]);

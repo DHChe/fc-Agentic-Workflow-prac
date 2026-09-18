@@ -37,6 +37,44 @@ export function checkStopReason(
   return stopReason === "refusal" ? "unreadable" : "unparsable";
 }
 
+type FinalMessage = {
+  stop_reason: string | null;
+  content: ReadonlyArray<{ type: string; text?: string }>;
+};
+
+export function readExtraction(final: FinalMessage): ExtractionResult {
+  const stopFailure = checkStopReason(final.stop_reason);
+  if (stopFailure !== null) {
+    throw new ExtractionError(stopFailure);
+  }
+
+  const textBlock = final.content.find((block) => block.type === "text");
+  if (textBlock?.text === undefined) {
+    throw new ExtractionError("unparsable");
+  }
+
+  let payload: unknown;
+
+  try {
+    payload = JSON.parse(textBlock.text);
+  } catch {
+    throw new ExtractionError("unparsable");
+  }
+
+  const parsed = extractionSchema.safeParse(payload);
+  if (!parsed.success) {
+    throw new ExtractionError("unparsable");
+  }
+
+  return {
+    ...parsed.data,
+    transactions: parsed.data.transactions.map((transaction) => ({
+      ...transaction,
+      cardLast4: cleanCardLast4(transaction.cardLast4),
+    })),
+  };
+}
+
 async function waitForTestFixture(): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, TEST_FIXTURE_DELAY_MS));
 }
@@ -78,6 +116,7 @@ export async function extractDocument(
             data: input.pdf.toString("base64"),
           },
         };
+  const { schema } = zodOutputFormat(extractionSchema);
   const stream = getClaudeClient().messages.stream({
     model,
     max_tokens: 32_000,
@@ -92,7 +131,7 @@ export async function extractDocument(
       },
     ],
     output_config: {
-      format: zodOutputFormat(extractionSchema),
+      format: { type: "json_schema", schema },
       effort: "low",
     },
   });
@@ -107,23 +146,5 @@ export async function extractDocument(
     }),
   );
 
-  const stopFailure = checkStopReason(final.stop_reason);
-  if (stopFailure !== null) {
-    throw new ExtractionError(stopFailure);
-  }
-
-  const parsed = extractionSchema.safeParse(final.parsed_output);
-  if (!parsed.success) {
-    throw new ExtractionError("unparsable");
-  }
-
-  const result: ExtractionResult = {
-    ...parsed.data,
-    transactions: parsed.data.transactions.map((transaction) => ({
-      ...transaction,
-      cardLast4: cleanCardLast4(transaction.cardLast4),
-    })),
-  };
-
-  return { result, model };
+  return { result: readExtraction(final), model };
 }

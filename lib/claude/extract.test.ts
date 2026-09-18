@@ -8,6 +8,7 @@ import {
   ExtractionError,
   checkStopReason,
   extractDocument,
+  readExtraction,
 } from "./extract";
 import {
   EXTRACT_SYSTEM_PROMPT,
@@ -40,6 +41,122 @@ describe("checkStopReason", () => {
       expect(checkStopReason(stopReason)).toBe("unparsable");
     },
   );
+});
+
+describe("readExtraction", () => {
+  const VALID_EXTRACTION = {
+    docType: "receipt",
+    transactions: [
+      {
+        transactedAt: "2026-09-09T12:24:00",
+        merchantName: "파리바게뜨 역삼점",
+        totalAmount: 17_300,
+        cardLast4: "****-9012",
+        category: "food_welfare",
+      },
+    ],
+  };
+  const VALID_JSON = JSON.stringify(VALID_EXTRACTION);
+
+  type FinalMessage = Parameters<typeof readExtraction>[0];
+
+  function finalMessage(
+    stopReason: string | null,
+    text?: string,
+  ): FinalMessage {
+    return {
+      stop_reason: stopReason,
+      content: text === undefined ? [] : [{ type: "text", text }],
+    };
+  }
+
+  function failureCodeOf(final: FinalMessage): string {
+    try {
+      readExtraction(final);
+    } catch (error) {
+      expect(error).toBeInstanceOf(ExtractionError);
+      return (error as ExtractionError).code;
+    }
+
+    throw new Error("readExtraction이 오류를 던지지 않았다");
+  }
+
+  it("max_tokens로 잘린 JSON은 해석 실패다", () => {
+    const truncated = VALID_JSON.slice(0, Math.floor(VALID_JSON.length / 2));
+
+    expect(failureCodeOf(finalMessage("max_tokens", truncated))).toBe(
+      "unparsable",
+    );
+  });
+
+  it("max_tokens는 본문이 올바른 JSON이어도 해석 실패다", () => {
+    expect(failureCodeOf(finalMessage("max_tokens", VALID_JSON))).toBe(
+      "unparsable",
+    );
+  });
+
+  it("refusal은 본문이 JSON이 아니어도 읽기 실패다", () => {
+    expect(
+      failureCodeOf(finalMessage("refusal", "죄송하지만 도와드릴 수 없습니다.")),
+    ).toBe("unreadable");
+  });
+
+  it("refusal은 텍스트 블록이 없어도 읽기 실패다", () => {
+    expect(failureCodeOf(finalMessage("refusal"))).toBe("unreadable");
+  });
+
+  it("end_turn인데 JSON 문법이 깨졌으면 해석 실패다", () => {
+    expect(failureCodeOf(finalMessage("end_turn", "{ docType: "))).toBe(
+      "unparsable",
+    );
+  });
+
+  it("목록에 없는 카테고리는 해석 실패다", () => {
+    const text = JSON.stringify({
+      ...VALID_EXTRACTION,
+      transactions: [
+        { ...VALID_EXTRACTION.transactions[0], category: "travel_mileage" },
+      ],
+    });
+
+    expect(failureCodeOf(finalMessage("end_turn", text))).toBe("unparsable");
+  });
+
+  it("상호명이 101자면 해석 실패다", () => {
+    const text = JSON.stringify({
+      ...VALID_EXTRACTION,
+      transactions: [
+        { ...VALID_EXTRACTION.transactions[0], merchantName: "가".repeat(101) },
+      ],
+    });
+
+    expect(failureCodeOf(finalMessage("end_turn", text))).toBe("unparsable");
+  });
+
+  it("기타 문서인데 거래가 있으면 해석 실패다", () => {
+    const text = JSON.stringify({ ...VALID_EXTRACTION, docType: "other" });
+
+    expect(failureCodeOf(finalMessage("end_turn", text))).toBe("unparsable");
+  });
+
+  it("텍스트 블록이 하나도 없으면 해석 실패다", () => {
+    expect(failureCodeOf(finalMessage("end_turn"))).toBe("unparsable");
+  });
+
+  it("정상 응답은 카드 끝 4자리를 정리해 돌려준다", () => {
+    expect(readExtraction(finalMessage("end_turn", VALID_JSON))).toEqual({
+      docType: "receipt",
+      transactions: [
+        {
+          transactedAt: "2026-09-09T12:24:00",
+          merchantName: "파리바게뜨 역삼점",
+          totalAmount: 17_300,
+          cardLast4: "9012",
+          category: "food_welfare",
+        },
+      ],
+    });
+  });
 });
 
 describe("extractDocument 테스트 모드", () => {
