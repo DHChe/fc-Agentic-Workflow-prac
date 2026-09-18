@@ -69,7 +69,9 @@
     {
       "step": 8,
       "name": "upload-api",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T20:35:46+0900",
+      "summary": "app/api/blob/upload/route.ts와 app/api/documents/route.ts 생성; lib/upload/rules.ts exports: decideUploadToken, createDocumentBodySchema. @vercel/blob 2.8.0의 handleUpload는 onBeforeGenerateToken 오류를 감싸지 않고 그대로 전파하며, 설치된 타입에서 onUploadCompleted가 선택 사항이라 넘기지 않았다. 확인 문서와 다른 타입 정의는 없었다."
     },
     {
       "step": 9,
