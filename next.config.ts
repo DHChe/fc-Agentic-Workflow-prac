@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // next dev가 AGENTS.md·CLAUDE.md에 안내 블록을 덧붙이지 않게 한다(하네스 파일 보호).
+  agentRules: false,
   async headers() {
     return [
       {
