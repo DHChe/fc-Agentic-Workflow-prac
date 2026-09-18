@@ -93,6 +93,7 @@ export const MESSAGES = {
       "시연 계정은 공개 계정입니다. 올린 파일은 다른 방문자에게도 보입니다.",
   },
   ui: {
+    brand: "SlipScan",
     section: {
       upload: "업로드",
       stats: "월 통계",

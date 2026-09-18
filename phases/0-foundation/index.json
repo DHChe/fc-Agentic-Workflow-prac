@@ -45,7 +45,10 @@
     {
       "step": 5,
       "name": "landing-and-shell",
-      "status": "pending"
+      "status": "completed",
+      "summary": "app/(marketing)/page.tsx 랜딩, components/app-header.tsx의 AppHeader(선택적 usage·필수 userMenu), app/dashboard/layout.tsx·page.tsx 대시보드 셸과 빈 상태를 만들고 시연 계정 메뉴 분기를 app/dashboard/layout.tsx에 두었으며 MESSAGES.ui.brand를 추가함",
+      "started_at": "2026-09-18T19:13:16+0900",
+      "completed_at": "2026-09-18T19:15:29+0900"
     }
   ],
   "created_at": "2026-09-18T18:41:06+0900"
