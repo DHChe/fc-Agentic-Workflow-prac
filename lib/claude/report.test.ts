@@ -177,7 +177,7 @@ describe("buildReportInput", () => {
   it("총액이 0 이하면 모든 카테고리 비율이 null이다", () => {
     const input = buildReportInput("2026-08", [
       reportRow("2026-08-01T09:00:00+09:00", 1_000, "결제"),
-      reportRow("2026-08-02T09:00:00+09:00", -1_000, "취소"),
+      reportRow("2026-08-02T09:00:00+09:00", -1_000, "취소", "office_equipment"),
     ]);
     const summary = JSON.parse(input.summaryJson) as {
       total: number;
@@ -185,10 +185,47 @@ describe("buildReportInput", () => {
     };
 
     expect(summary.total).toBe(0);
+    expect(summary.categories).toHaveLength(2);
     expect(summary.categories.every(({ ratio }) => ratio === null)).toBe(true);
   });
 
-  it("가맹점 null은 대시로 쓰고 거래 행 수만큼 구분자 안에 한 줄씩 만든다", () => {
+  it("금액이 0인 카테고리는 요약에서 뺀다", () => {
+    const input = buildReportInput("2026-08", [
+      reportRow("2026-08-01T09:00:00+09:00", 1_000, "결제"),
+    ]);
+    const summary = JSON.parse(input.summaryJson) as {
+      categories: Array<{
+        key: string;
+        label: string;
+        amount: number;
+        ratio: number | null;
+      }>;
+    };
+
+    expect(summary.categories).toEqual([
+      {
+        key: "food_welfare",
+        label: "식비·복리후생",
+        amount: 1_000,
+        ratio: 1,
+      },
+    ]);
+  });
+
+  it("가맹점 이름이 없으면 상위 목록과 거래 목록에 가맹점 미인식으로 쓴다", () => {
+    const input = buildReportInput("2026-08", [
+      reportRow("2026-08-01T09:00:00+09:00", 1_000, null),
+    ]);
+    const summary = JSON.parse(input.summaryJson) as {
+      top5: Array<{ merchant: string }>;
+    };
+
+    expect(summary.top5[0].merchant).toBe("가맹점 미인식");
+    expect(input.transactionsBlock).toContain("가맹점: 가맹점 미인식");
+    expect(input.transactionsBlock).not.toContain("가맹점: —");
+  });
+
+  it("거래 행 수만큼 구분자 안에 한 줄씩 만든다", () => {
     const rows = [
       reportRow("2026-08-01T09:00:00+09:00", 1_000, null),
       reportRow("2026-08-02T09:00:00+09:00", 2_000, "가맹점"),
@@ -199,7 +236,6 @@ describe("buildReportInput", () => {
     expect(input.transactionsBlock.startsWith("<transactions>\n")).toBe(true);
     expect(input.transactionsBlock.endsWith("\n</transactions>")).toBe(true);
     expect(lines.slice(1, -1)).toHaveLength(rows.length);
-    expect(lines[1]).toContain("—");
     expect(() => JSON.parse(input.summaryJson)).not.toThrow();
   });
 });
