@@ -7,7 +7,8 @@
       "name": "project-setup",
       "status": "completed",
       "summary": "Next.js 16·React 19·TypeScript 5·Tailwind CSS 4·ESLint 9·Vitest 5 앱 뼈대와 dev/build/start/lint/test 스크립트 및 보안 헤더 테스트를 구성함(TypeScript 7과 ESLint 10은 eslint-config-next 의존성의 피어 범위 밖이라 각각 5·9로 하향)",
-      "started_at": "2026-09-18T18:41:06+0900"
+      "started_at": "2026-09-18T18:41:06+0900",
+      "completed_at": "2026-09-18T18:47:29+0900"
     },
     {
       "step": 1,
