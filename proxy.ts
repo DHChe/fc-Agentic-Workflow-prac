@@ -7,20 +7,23 @@ const isProtectedPage = createRouteMatcher(["/dashboard(.*)"]);
 const isPublicApi = createRouteMatcher(["/api/demo-login"]);
 const isApiRoute = createRouteMatcher(["/api(.*)"]);
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
+export default clerkMiddleware(
+  async (auth, req) => {
+    const { userId } = await auth();
 
-  if (isApiRoute(req) && !isPublicApi(req) && !userId) {
-    return NextResponse.json(
-      { error: MESSAGES.api.unauthorized },
-      { status: 401 },
-    );
-  }
+    if (isApiRoute(req) && !isPublicApi(req) && !userId) {
+      return NextResponse.json(
+        { error: MESSAGES.api.unauthorized },
+        { status: 401 },
+      );
+    }
 
-  if (isProtectedPage(req)) {
-    await auth.protect();
-  }
-});
+    if (isProtectedPage(req)) {
+      await auth.protect();
+    }
+  },
+  { signInUrl: "/sign-in" },
+);
 
 export const config = {
   matcher: [
