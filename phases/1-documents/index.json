@@ -7,7 +7,8 @@
       "name": "date-and-stats-lib",
       "status": "completed",
       "started_at": "2026-09-18T19:48:29+0900",
-      "summary": "lib/stats/aggregate.ts와 lib/stats/aggregate.test.ts 생성; exports: seoulDayStart, seoulDateKey, currentSeoulMonth, isValidMonth, monthRange, shiftMonth, parseTransactedAt, StatRow, MonthStats, aggregateMonth, pickDefaultMonth, getMonthStats, getDefaultMonth, countReportableTransactions"
+      "summary": "lib/stats/aggregate.ts와 lib/stats/aggregate.test.ts 생성; exports: seoulDayStart, seoulDateKey, currentSeoulMonth, isValidMonth, monthRange, shiftMonth, parseTransactedAt, StatRow, MonthStats, aggregateMonth, pickDefaultMonth, getMonthStats, getDefaultMonth, countReportableTransactions",
+      "completed_at": "2026-09-18T19:54:07+0900"
     },
     {
       "step": 1,
