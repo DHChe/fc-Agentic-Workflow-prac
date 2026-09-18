@@ -1,0 +1,208 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@theme inline {
+  --font-sans: var(--font-pretendard);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-strong: var(--strong);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-disabled: var(--disabled);
+  --color-sunken: var(--sunken);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-press: var(--primary-press);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-ring: var(--ring);
+  --color-pos: var(--pos);
+  --color-pos-weak: var(--pos-weak);
+  --color-destructive: var(--destructive);
+  --color-destructive-weak: var(--destructive-weak);
+  --color-warn: var(--warn);
+  --color-warn-weak: var(--warn-weak);
+  --color-pos-border: var(--pos-border);
+  --color-accent-border: var(--accent-border);
+  --color-destructive-border: var(--destructive-border);
+  --color-warn-border: var(--warn-border);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
+  --color-chart-7: var(--chart-7);
+  --color-chart-8: var(--chart-8);
+}
+
+:root {
+  --background: #f7f8f7;
+  --foreground: #42504f;
+  --card: #ffffff;
+  --card-foreground: #42504f;
+  --popover: #ffffff;
+  --popover-foreground: #42504f;
+  --strong: #14201f;
+  --secondary: #ffffff;
+  --secondary-foreground: #14201f;
+  --muted: #eff2f1;
+  --muted-foreground: #7d8a89;
+  --disabled: #a9b3b2;
+  --sunken: #f7f8f7;
+  --border: #e4e8e7;
+  --border-soft: #eff2f1;
+  --border-strong: #c7cfd3;
+  --input: #e4e8e7;
+  --primary: #0d5c5a;
+  --primary-foreground: #ffffff;
+  --primary-press: #094442;
+  --accent: #f2f7f7;
+  --accent-foreground: #0d5c5a;
+  --ring: #1a7d78;
+  --pos: #1f7a4d;
+  --pos-weak: #f4faf7;
+  --destructive: #a8342f;
+  --destructive-weak: #fdf6f5;
+  --warn: #8a6108;
+  --warn-weak: #fdf8ec;
+  --pos-border: #cfe3d8;
+  --accent-border: #d8e2e1;
+  --destructive-border: #eed4d2;
+  --warn-border: #efe3c4;
+  --chart-1: #0d5c5a;
+  --chart-2: #1a7d78;
+  --chart-3: #37a09a;
+  --chart-4: #6cbcb6;
+  --chart-5: #a3d5d1;
+  --chart-6: #4a5a63;
+  --chart-7: #8b979e;
+  --chart-8: #c7cfd3;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    font-family:
+      var(--font-pretendard), -apple-system, BlinkMacSystemFont,
+      "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-size: 14px;
+    line-height: 1.6;
+    word-break: keep-all;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    border-radius: 5px;
+  }
+
+  button,
+  a {
+    transition-property: color, background-color, border-color;
+    transition-duration: 100ms;
+    transition-timing-function: linear;
+  }
+
+  :focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--accent),
+      0 0 0 3px var(--ring);
+  }
+}
+
+@utility text-display {
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+@utility text-h1 {
+  font-size: 22px;
+  line-height: 1.35;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+@utility text-h2 {
+  font-size: 17px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+@utility text-h3 {
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 500;
+}
+
+@utility text-body {
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+@utility text-cell {
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+@utility text-caption {
+  font-size: 12px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+@utility text-micro {
+  font-size: 11px;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+@utility text-amount-lg {
+  font-size: 34px;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@utility text-amount-md {
+  font-size: 20px;
+  line-height: 1.3;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+@utility text-amount-sm {
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}

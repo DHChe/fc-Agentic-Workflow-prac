@@ -5,32 +5,52 @@
     {
       "step": 0,
       "name": "project-setup",
-      "status": "pending"
+      "status": "completed",
+      "summary": "Next.js 16·React 19·TypeScript 5·Tailwind CSS 4·ESLint 9·Vitest 5 앱 뼈대와 dev/build/start/lint/test 스크립트 및 보안 헤더 테스트를 구성함(TypeScript 7과 ESLint 10은 eslint-config-next 의존성의 피어 범위 밖이라 각각 5·9로 하향)",
+      "started_at": "2026-09-18T18:41:06+0900",
+      "completed_at": "2026-09-18T18:47:29+0900"
     },
     {
       "step": 1,
       "name": "shared-constants",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T18:47:29+0900",
+      "summary": "MESSAGES·FailureCode, CATEGORY_KEYS·CategoryKey·CATEGORY_LABELS, formatAmount·formatRatio·formatMonthLabel·formatDateTime·formatDate를 추가하고 MESSAGES.ui에 section·uploadPrompt·uploadLimits·uploadDone·documentType·documentColumn·transactionColumn·statsColumn·reportColumn·documentTotal·documentTotalDescription·statsDescription·transactionCount·modelUsed·dashboard·delete·cancel·open·dashboardLink·pageNotFound·copied·reportGenerating 키를 구성함",
+      "completed_at": "2026-09-18T18:51:17+0900"
     },
     {
       "step": 2,
       "name": "db-schema",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T18:51:17+0900",
+      "summary": "documents·transactions·reports·usageLog와 DocType·DocumentStatus·ReportStatus·UsageKind를 내보내는 Drizzle 스키마, lazy Neon Pool의 getDb·Db·Tx, 0000_chubby_marvel_boy.sql 마이그레이션, db:generate·db:migrate 스크립트, 롤백 스모크 도구를 구성하고 테스트 DB(ep-round-bar-b3fcvekm-pooler.c-4.ap-southeast-1.aws.neon.tech)에 적용함(Node 22 전역 WebSocket으로 동작해 ws 불필요)",
+      "completed_at": "2026-09-18T18:57:21+0900"
     },
     {
       "step": 3,
       "name": "design-system",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T18:57:21+0900",
+      "summary": "components/ui/button.tsx의 Button(variant primary·secondary·ghost·danger, size md·sm·xs, asChild), components/ui/badge.tsx의 Badge(tone processing·completed·failed·warn·duplicate), components/panel.tsx의 Panel(children), components/section.tsx의 Section(title·aside·children), components/empty-state.tsx의 EmptyState(icon·text), components/notice-line.tsx의 NoticeLine(tone info·warn·error·children)을 추가하고, 확장 토큰 strong·disabled·sunken·border-soft·border-strong·primary-press·pos·pos-weak·destructive-weak·warn·warn-weak·pos-border·accent-border·destructive-border·warn-border·chart-6~8, text-display·text-h1·text-h2·text-h3·text-body·text-cell·text-caption·text-micro·text-amount-lg·text-amount-md·text-amount-sm 유틸리티, 로컬 Pretendard CSS 변수 --font-pretendard를 구성함",
+      "completed_at": "2026-09-18T19:06:33+0900"
     },
     {
       "step": 4,
       "name": "auth-and-routing",
-      "status": "pending"
+      "status": "completed",
+      "summary": "Clerk 7.9.4·koKR를 연결하고 proxy.ts·/sign-in·POST /api/demo-login·not-found/error 화면을 구성함(<SignIn />의 __clerk_ticket 자동 소비는 확인되지 않아 TicketSignIn의 signIn.ticket→finalize 흐름을 추가했으며 무료 플랜·Invite-only의 sign-in token 동작은 수동 확인으로 남김)",
+      "started_at": "2026-09-18T19:06:33+0900",
+      "completed_at": "2026-09-18T19:13:16+0900"
     },
     {
       "step": 5,
       "name": "landing-and-shell",
-      "status": "pending"
+      "status": "completed",
+      "summary": "app/(marketing)/page.tsx 랜딩, components/app-header.tsx의 AppHeader(선택적 usage·필수 userMenu), app/dashboard/layout.tsx·page.tsx 대시보드 셸과 빈 상태를 만들고 시연 계정 메뉴 분기를 app/dashboard/layout.tsx에 두었으며 MESSAGES.ui.brand를 추가함",
+      "started_at": "2026-09-18T19:13:16+0900",
+      "completed_at": "2026-09-18T19:16:24+0900"
     }
-  ]
+  ],
+  "created_at": "2026-09-18T18:41:06+0900",
+  "completed_at": "2026-09-18T19:16:24+0900"
 }
