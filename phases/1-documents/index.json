@@ -21,7 +21,9 @@
     {
       "step": 2,
       "name": "claude-schemas-and-fixtures",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T19:58:51+0900",
+      "summary": "lib/claude/schemas.ts exports: extractionSchema, ExtractionResult, cleanCardLast4; lib/claude/client.ts exports: isTestMode, getModel, getClaudeClient; lib/claude/fixtures/index.ts exports: FixtureName, pickFixtureName, RECEIPT_OK, throwFailApi, REPORT_OK_CHUNKS. @anthropic-ai/sdk 0.126.0과 zod 4.6.5 설치; zodOutputFormat이 미지원 제약 키워드를 제외하므로 별도 extractionWireSchema 없음; throwFailApi는 Anthropic.InternalServerError(status 500)를 던짐."
     },
     {
       "step": 3,
