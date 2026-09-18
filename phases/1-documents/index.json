@@ -48,7 +48,7 @@
       "status": "completed",
       "started_at": "2026-09-18T20:15:14+0900",
       "summary": "lib/pipeline/image.ts·pdf.ts·duplicates.ts 생성(exports: toAnalysisJpeg, MAX_PDF_PAGES, inspectPdf, DupCandidate, DupSubject, findDuplicateOf, markDuplicates); qpdf 부재로 EncryptedPDFError stub 테스트, pdf-lib 1.17.1 런타임의 instanceof 불일치는 동일 오류 메시지 판별로 보정; next.config.ts에 serverExternalPackages: ['sharp'] 추가",
-      "completed_at": "2026-09-18T20:21:26+0900"
+      "completed_at": "2026-09-18T20:22:41+0900"
     },
     {
       "step": 6,
