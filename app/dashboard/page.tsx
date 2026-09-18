@@ -1,5 +1,6 @@
-import { ChartPie, FileText, Inbox, Upload } from "lucide-react";
+import { ChartPie, FileText, Upload } from "lucide-react";
 
+import { DocumentList } from "@/components/dashboard/document-list";
 import { EmptyState } from "@/components/empty-state";
 import { Section } from "@/components/section";
 import { MESSAGES } from "@/lib/messages";
@@ -26,7 +27,7 @@ export default function DashboardPage(): React.JSX.Element {
       </Section>
 
       <Section title={MESSAGES.ui.section.documents}>
-        <EmptyState icon={Inbox} text={MESSAGES.empty.documents} />
+        <DocumentList />
       </Section>
 
       <Section title={MESSAGES.ui.section.reports}>
