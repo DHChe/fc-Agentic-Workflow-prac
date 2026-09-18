@@ -40,6 +40,7 @@ jobs:
       BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
       CYPRESS_E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
       CYPRESS_E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
+      CYPRESS_E2E_USER_ID: ${{ secrets.E2E_USER_ID }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v7

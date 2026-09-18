@@ -7,14 +7,14 @@ const REPORT_SECTION_TITLES = [
 ];
 
 describe("영수증 업로드와 월간 보고서", () => {
-  const email = Cypress.env("E2E_USER_EMAIL") as string;
+  const userId = Cypress.env("E2E_USER_ID") as string;
 
   after(() => {
-    cy.task("resetUser", email);
+    cy.task("resetUser", userId);
   });
 
   it("샘플 거래를 집계하고 보고서를 저장한다", () => {
-    cy.task("resetUser", email);
+    cy.task("resetUser", userId);
     cy.signInAsTestUser();
     cy.interceptBlobUpload();
 

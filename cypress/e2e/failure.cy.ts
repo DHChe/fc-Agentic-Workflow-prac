@@ -2,14 +2,14 @@ const UPSTREAM_FAILURE_MESSAGE =
   "분석 서비스가 일시적으로 응답하지 않습니다.";
 
 describe("문서 분석 실패", () => {
-  const email = Cypress.env("E2E_USER_EMAIL") as string;
+  const userId = Cypress.env("E2E_USER_ID") as string;
 
   after(() => {
-    cy.task("resetUser", email);
+    cy.task("resetUser", userId);
   });
 
   it("분석 서비스 실패 사유와 사용량을 표시한다", () => {
-    cy.task("resetUser", email);
+    cy.task("resetUser", userId);
     cy.signInAsTestUser();
     cy.interceptBlobUpload();
 

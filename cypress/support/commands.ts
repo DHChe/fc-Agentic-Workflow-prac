@@ -46,12 +46,7 @@ Cypress.Commands.add("signInAsTestUser", () => {
       cy.clerkLoaded();
       cy.clerkSignIn({ strategy: "password", identifier, password });
       cy.window().should((window) => {
-        if (window.Clerk.client?.signIn.status === "needs_client_trust") {
-          throw new Error(
-            "Clerk Device Trust must be disabled for the development E2E instance",
-          );
-        }
-
+        // Clerk 대시보드 Protect → Rules의 Device Trust가 켜져 있으면 비밀번호 로그인이 2단계를 요구해 세션이 만들어지지 않는다.
         expect(window.Clerk.session).not.to.equal(null);
       });
     },
