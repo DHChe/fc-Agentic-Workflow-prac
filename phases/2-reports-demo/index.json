@@ -37,7 +37,10 @@
     {
       "step": 4,
       "name": "demo-seed",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T23:21:50+0900",
+      "summary": "scripts/seed-demo.ts와 npm run seed:demo로 문서 10건·거래 14건·중복 1건·날짜 추정 1건·2026-08 완료 보고서 1건을 멱등 시드하고, --verify와 --usage-count 읽기 전용 플래그를 제공함; 다른 DB에는 DATABASE_URL·BLOB_READ_WRITE_TOKEN·DEMO_USER_ID만 바꿔 실행함",
+      "completed_at": "2026-09-18T23:28:53+0900"
     },
     {
       "step": 5,
