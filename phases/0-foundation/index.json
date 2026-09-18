@@ -37,7 +37,9 @@
     {
       "step": 4,
       "name": "auth-and-routing",
-      "status": "pending"
+      "status": "completed",
+      "summary": "Clerk 7.9.4·koKR를 연결하고 proxy.ts·/sign-in·POST /api/demo-login·not-found/error 화면을 구성함(<SignIn />의 __clerk_ticket 자동 소비는 확인되지 않아 TicketSignIn의 signIn.ticket→finalize 흐름을 추가했으며 무료 플랜·Invite-only의 sign-in token 동작은 수동 확인으로 남김)",
+      "started_at": "2026-09-18T19:06:33+0900"
     },
     {
       "step": 5,

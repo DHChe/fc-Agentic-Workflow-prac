@@ -1,3 +1,5 @@
+import { ClerkProvider } from "@clerk/nextjs";
+import { koKR } from "@clerk/localizations";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
@@ -15,8 +17,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ko" className={pretendard.variable}>
-      <body>{children}</body>
-    </html>
+    <ClerkProvider
+      localization={koKR}
+      signInUrl="/sign-in"
+      signInFallbackRedirectUrl="/dashboard"
+      afterSignOutUrl="/"
+    >
+      <html lang="ko" className={pretendard.variable}>
+        <body>{children}</body>
+      </html>
+    </ClerkProvider>
   );
 }
