@@ -56,7 +56,7 @@
       "status": "completed",
       "started_at": "2026-09-19T00:08:15+0900",
       "summary": "cypress/e2e/happy-path.cy.ts·failure.cy.ts·limit.cy.ts 정확히 3개 시나리오와 cypress/fixtures/fail-api.jpg, PR용 .github/workflows/e2e.yml을 구성해 모두 통과함; 앱 코드 수정: 없음; E2E 하네스는 cypress.config.ts·cypress/support/commands.ts·package.json에서 Chrome Blob PUT 인터셉트 안정화와 Clerk cross-spec 세션 재사용을 적용함; GitHub Secrets 등록 필요: DATABASE_URL, NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY, BLOB_READ_WRITE_TOKEN, E2E_USER_EMAIL, E2E_USER_PASSWORD",
-      "completed_at": "2026-09-19T00:27:31+0900"
+      "completed_at": "2026-09-19T00:28:57+0900"
     }
   ],
   "created_at": "2026-09-18T22:57:44+0900"
