@@ -14,6 +14,7 @@ export default defineConfig({
       "node_modules/**",
       ".next/**",
       "cypress/**",
+      "cypress.config.ts",
       "graft/**",
       "phases/**",
       "scripts/__pycache__/**",

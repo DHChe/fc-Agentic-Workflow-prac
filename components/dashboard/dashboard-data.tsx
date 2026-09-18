@@ -11,8 +11,10 @@ import {
 import type * as React from "react";
 
 import {
+  createRefreshQueue,
   nextTickAction,
   POLL_INTERVAL_MS,
+  type RefreshQueue,
   shouldPoll,
 } from "@/components/dashboard/polling";
 import type { DashboardResponse } from "@/lib/api-types";
@@ -38,14 +40,10 @@ export function DashboardDataProvider(props: {
   const redirectingRef = useRef(false);
   const selectedMonthRef = useRef<string | null>(null);
   const selectionVersionRef = useRef(0);
-  const inFlightRef = useRef<Promise<DashboardResponse | null> | null>(null);
+  const queueRef = useRef<RefreshQueue<DashboardResponse | null> | null>(null);
   const hasProcessingRef = useRef(false);
 
-  const refresh = useCallback((): Promise<DashboardResponse | null> => {
-    if (inFlightRef.current) {
-      return inFlightRef.current;
-    }
-
+  const fetchDashboard = useCallback((): Promise<DashboardResponse | null> => {
     const selectedMonth = selectedMonthRef.current;
     const selectionVersion = selectionVersionRef.current;
     const url = selectedMonth
@@ -56,7 +54,7 @@ export function DashboardDataProvider(props: {
       setLoading(true);
     }
 
-    const request = (async (): Promise<DashboardResponse | null> => {
+    return (async (): Promise<DashboardResponse | null> => {
       try {
         const response = await fetch(url, { cache: "no-store" });
 
@@ -97,16 +95,13 @@ export function DashboardDataProvider(props: {
         }
       }
     })();
-
-    inFlightRef.current = request;
-    void request.finally(() => {
-      if (inFlightRef.current === request) {
-        inFlightRef.current = null;
-      }
-    });
-
-    return request;
   }, []);
+
+  const refresh = useCallback((): Promise<DashboardResponse | null> => {
+    const queue = (queueRef.current ??= createRefreshQueue(fetchDashboard));
+
+    return queue.request();
+  }, [fetchDashboard]);
 
   const setMonth = useCallback(
     (nextMonth: string): void => {
@@ -114,20 +109,9 @@ export function DashboardDataProvider(props: {
       selectedMonthRef.current = nextMonth;
       setDisplayedMonth(nextMonth);
 
-      const currentRequest = inFlightRef.current;
-      void (async () => {
-        if (currentRequest) {
-          await currentRequest;
-        }
-
-        if (
-          mountedRef.current &&
-          selectedMonthRef.current === nextMonth &&
-          !redirectingRef.current
-        ) {
-          await refresh();
-        }
-      })();
+      if (!redirectingRef.current) {
+        void refresh();
+      }
     },
     [refresh],
   );
@@ -152,7 +136,7 @@ export function DashboardDataProvider(props: {
 
     const timer = window.setInterval(() => {
       const action = nextTickAction({
-        inFlight: inFlightRef.current !== null,
+        inFlight: queueRef.current?.isBusy() ?? false,
         hasProcessing: hasProcessingRef.current,
       });
 
