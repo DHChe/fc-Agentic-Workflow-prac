@@ -1,10 +1,16 @@
+import Anthropic from "@anthropic-ai/sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { MESSAGES } from "@/lib/messages";
+
+import { throwFailApi } from "./fixtures/fail-api";
 import { REPORT_OK_CHUNKS } from "./fixtures";
 import {
   REPORT_SECTION_TITLES,
   buildReportInput,
+  parseReportRequest,
   streamReport,
+  toReportErrorResponse,
   type ReportRow,
 } from "./report";
 import { REPORT_SYSTEM_PROMPT } from "./prompts/report";
@@ -34,6 +40,75 @@ function reportRow(
     cardLast4: "1234",
   };
 }
+
+function anthropicApiError(status: number): Anthropic.APIError {
+  return Anthropic.APIError.generate(
+    status,
+    {
+      type: "error",
+      error: { type: "api_error", message: "테스트용 오류" },
+    },
+    "테스트용 오류",
+    new Headers(),
+  );
+}
+
+describe("parseReportRequest", () => {
+  it("유효한 월 요청만 통과시킨다", () => {
+    expect(parseReportRequest({ month: "2026-09" })).toEqual({
+      month: "2026-09",
+    });
+  });
+
+  it.each([
+    { month: "2026-13" },
+    { month: "2026-9" },
+    { month: 202609 },
+    {},
+    null,
+    [],
+  ])("잘못된 요청 %p는 null을 돌려준다", (body) => {
+    expect(parseReportRequest(body)).toBeNull();
+  });
+});
+
+describe("toReportErrorResponse", () => {
+  it.each([
+    anthropicApiError(429),
+    anthropicApiError(503),
+    new Anthropic.APIConnectionTimeoutError({ message: "timed out" }),
+  ])("Anthropic 외부 서비스 오류 %p를 502로 바꾼다", (error) => {
+    expect(toReportErrorResponse(error)).toEqual({
+      status: 502,
+      error: MESSAGES.api.upstream,
+    });
+  });
+
+  it("fail-api fixture 오류를 502로 바꾼다", () => {
+    let error: unknown;
+
+    try {
+      throwFailApi();
+    } catch (caught) {
+      error = caught;
+    }
+
+    expect(toReportErrorResponse(error)).toEqual({
+      status: 502,
+      error: MESSAGES.api.upstream,
+    });
+  });
+
+  it.each([new Error("db down"), "plain string"])(
+    "그 밖의 오류 %p를 500으로 바꾼다",
+    (error) => {
+      expect(toReportErrorResponse(error)).toEqual({
+        status: 500,
+        error: MESSAGES.api.internal,
+      });
+    },
+  );
+});
 
 describe("buildReportInput", () => {
   it("상위 5건을 금액 내림차순, 동액이면 이른 거래일 순으로 만든다", () => {
