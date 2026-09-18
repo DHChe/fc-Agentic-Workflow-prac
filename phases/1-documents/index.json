@@ -64,7 +64,7 @@
       "status": "completed",
       "started_at": "2026-09-18T20:28:50+0900",
       "summary": "lib/pipeline/process-document.ts와 순수 함수 단위 테스트 생성; exports: PROCESSING_TIMEOUT_MS, isTimedOut, toFailureCode, toTransactionRows, expireStaleDocuments, processDocument. 성공 트랜잭션은 processing 재확인 → 기존 거래 삭제 → 새 거래 삽입 → 중복 판정 → completed 갱신 순서이며, step 8의 after()에서 processDocument(documentId, { fileName })를 호출하고 step 9의 조회 API에서 expireStaleDocuments(userId, now)를 호출하면 된다.",
-      "completed_at": "2026-09-18T20:34:44+0900"
+      "completed_at": "2026-09-18T20:35:46+0900"
     },
     {
       "step": 8,
