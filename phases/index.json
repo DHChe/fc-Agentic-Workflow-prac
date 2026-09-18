@@ -1,0 +1,16 @@
+{
+  "phases": [
+    {
+      "dir": "0-foundation",
+      "status": "pending"
+    },
+    {
+      "dir": "1-documents",
+      "status": "pending"
+    },
+    {
+      "dir": "2-reports-demo",
+      "status": "pending"
+    }
+  ]
+}

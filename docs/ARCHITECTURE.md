@@ -6,7 +6,7 @@
 | 작성일 | 2026-09-16 |
 | 짝 문서 | `docs/PRD.md` (무엇을 만드는가), `docs/USER_FLOWS.md` (누가 어떤 순서로, 문구). 이 문서는 어떻게 만드는가 |
 | 상태 | 확정. 구현 전. 이 브랜치의 설계 기준(SOT) |
-| 개정 | 2026-09-16: v1 계획과 비교해 충돌 항목 정리. 12절 ADR-12, 15~17과 3절 Next 16 행, 7.1 호출 설정, 8절 에러 응답 규약 추가<br/>2026-09-16 (2차): USER_FLOWS.md 결정 반영. 5.1 암호 PDF, 5.2 폴링 규칙, 5.3 오늘 날짜 입력, 5.4 기본 기간, 7.2 프롬프트 규칙, 10절 DEMO_USER_ID, 11절 시드·Clerk 설정, ADR-18~21, 13절 확인 항목<br/>2026-09-17: v1 브랜치(`feat/mvp-plan-vercel-deploy`) 전수 대조. 5.1 이미지 축소·업로드 URL 검증, 5.7 응답 헤더, ADR-22, 13절 확인 항목 2개<br/>2026-09-17 (2차): 세 모델(Claude·Codex·Grok) 교차 리뷰 반영. 시연 5분 여정(J1) 기준으로 범위 축소, 결함 수정(사용량 기록, 업로드 경로 검증, 트랜잭션, stop_reason, 날짜·시간대 등). 이 문서에서는 4절 디렉토리, 5.1~5.7, 6절 스키마(`usage_log` 추가)·카테고리 8개, 7절 호출 설정, 8절 API 9개·실패 원인 표, 9절 테스트, 10절 환경변수 8개, 11절 시드, ADR-1·9·10·13·19·21 개정과 ADR-23~27 추가, 13절 확인 항목<br/>2026-09-17 (3차): 서비스 생성 때 정한 리전(싱가포르 `sin1`) 기록. 3절 리전 제약 행, 11절 리전 항목, ADR-28<br/>2026-09-17 (4차): 디자인 시스템 반영(`docs/design.md`). ADR-16을 라이트 전용으로 개정, 9.3 수동 확인에서 다크 모드 배지 삭제<br/>2026-09-18: 11절 step 0 체크리스트의 Vercel 환경변수 교체를 완료로 표시 |
+| 개정 | 2026-09-16: v1 계획과 비교해 충돌 항목 정리. 12절 ADR-12, 15~17과 3절 Next 16 행, 7.1 호출 설정, 8절 에러 응답 규약 추가<br/>2026-09-16 (2차): USER_FLOWS.md 결정 반영. 5.1 암호 PDF, 5.2 폴링 규칙, 5.3 오늘 날짜 입력, 5.4 기본 기간, 7.2 프롬프트 규칙, 10절 DEMO_USER_ID, 11절 시드·Clerk 설정, ADR-18~21, 13절 확인 항목<br/>2026-09-17: v1 브랜치(`feat/mvp-plan-vercel-deploy`) 전수 대조. 5.1 이미지 축소·업로드 URL 검증, 5.7 응답 헤더, ADR-22, 13절 확인 항목 2개<br/>2026-09-17 (2차): 세 모델(Claude·Codex·Grok) 교차 리뷰 반영. 시연 5분 여정(J1) 기준으로 범위 축소, 결함 수정(사용량 기록, 업로드 경로 검증, 트랜잭션, stop_reason, 날짜·시간대 등). 이 문서에서는 4절 디렉토리, 5.1~5.7, 6절 스키마(`usage_log` 추가)·카테고리 8개, 7절 호출 설정, 8절 API 9개·실패 원인 표, 9절 테스트, 10절 환경변수 8개, 11절 시드, ADR-1·9·10·13·19·21 개정과 ADR-23~27 추가, 13절 확인 항목<br/>2026-09-17 (3차): 서비스 생성 때 정한 리전(싱가포르 `sin1`) 기록. 3절 리전 제약 행, 11절 리전 항목, ADR-28<br/>2026-09-17 (4차): 디자인 시스템 반영(`docs/design.md`). ADR-16을 라이트 전용으로 개정, 9.3 수동 확인에서 다크 모드 배지 삭제<br/>2026-09-18: 11절 step 0 체크리스트의 Vercel 환경변수 교체를 완료로 표시<br/>2026-09-18 (2차): 하네스 step 설계 반영. 4절에 추가 파일(`lib/format.ts`, `scripts/` 도구, `drizzle/`), 13.1 확인 결과, Cypress 메이저를 `@clerk/testing` 피어 범위로(2절·9.2·ADR-11) |
 
 기능 범위·제한값·예외 규칙의 출처는 PRD다. 두 문서가 어긋나면 PRD를 고치고 이 문서를 따라 맞춘다.
 
@@ -46,7 +46,7 @@ flowchart LR
 | PDF 페이지 수 | `pdf-lib` | 페이지 수를 세고 암호 PDF를 구분한다(5.1). Claude를 부르기 전에 끝낸다 | |
 | 보고서 렌더링 | `react-markdown` | 기본 설정이 raw HTML을 무시한다. 링크·이미지 요소는 허용하지 않는다(5.3) | |
 | 단위 테스트 | Vitest | 빠르고 TS 친화 | |
-| 화면 테스트 | Cypress 16 | 사용자 결정(Playwright 제외). Clerk 공식 헬퍼(`@clerk/testing`), GitHub Actions 공식 액션 | WebdriverIO: Clerk 헬퍼 없음. AI형(Midscene 등): LLM 비용·비결정성·모킹 미지원 |
+| 화면 테스트 | Cypress (`@clerk/testing`의 피어 범위가 허용하는 가장 새 메이저. 13.1) | 사용자 결정(Playwright 제외). Clerk 공식 헬퍼(`@clerk/testing`), GitHub Actions 공식 액션 | WebdriverIO: Clerk 헬퍼 없음. AI형(Midscene 등): LLM 비용·비결정성·모킹 미지원 |
 | ORM | Drizzle ORM | 스키마를 코드로 관리, Neon과 궁합, 가벼움 | Prisma: 무거움. 구현 시 팀 선호로 바꿔도 무방 |
 
 ## 3. 확인된 외부 제약 (2026-09-15 조사, 공식 문서 기준)
@@ -87,7 +87,7 @@ app/
     dashboard/route.ts            # GET: 오늘 사용량 + 월 통계 + 문서 목록
     reports/route.ts              # POST: 보고서 스트리밍 생성 / GET: 완료 목록
     reports/[id]/route.ts         # GET 상세 (status 포함)
-components/                       # 화면 부품 (shadcn/ui 기반)
+components/                       # 화면 부품 (shadcn/ui 기반). ui/ 기본 부품, dashboard/ · documents/ · reports/ 화면별 부품
 lib/
   db/schema.ts                    # Drizzle 스키마 (6절)
   db/client.ts                    # Pool + drizzle-orm/neon-serverless
@@ -102,12 +102,23 @@ lib/
   pipeline/pdf.ts                 # 페이지 수·암호 판정 (pdf-lib)
   pipeline/duplicates.ts          # 중복 감지
   upload/validate.ts              # 업로드 경로·blobUrl 검증
+  upload/rules.ts                 # 업로드 허가 판단·문서 생성 본문 검사 (라우트 파일은 HTTP 메서드만 내보낼 수 있어 따로 둔다)
   usage/limit.ts                  # 하루 50회 (usage_log)
   stats/aggregate.ts              # 월 통계 SQL, 기본 달, 날짜 경계
+  stats/document-summary.ts       # 문서 합계·건수 규칙 (PRD F5)
+  api-types.ts                    # API 응답 타입 (화면과 라우트가 같이 쓴다. 타입만)
   categories.ts                   # 8개 카테고리 상수
   messages.ts                     # 화면 문구·실패 사유·빈 상태 상수 (USER_FLOWS.md 7절이 출처)
+  format.ts                       # 금액·비율·날짜 표기 (design.md 6.3)
 scripts/
   seed-demo.ts                    # 시연 계정 샘플 데이터
+  seed-data.ts                    # 시드 구성의 단일 출처 (design.md 12.2)
+  generate-samples.ts             # 가짜 영수증·명세서 이미지 생성 → seed-assets/, public/samples/
+  seed-assets/                    # 시드 이미지 10장 + 확인용 명세서 PDF
+  try-extract.ts, try-report.ts   # 실제 Claude 호출 수동 확인 (9.3)
+  db-smoke.ts                     # 테스트 DB 트랜잭션 확인
+  e2e-prepare.ts                  # Cypress 실행 전 테스트 계정 데이터 준비 (9.2)
+drizzle/                          # 마이그레이션 SQL (drizzle-kit generate)
 public/
   samples/receipt-sample.jpg      # "샘플로 해보기" 영수증 (2026년 9월 날짜, 시드와 겹치지 않는 결제)
 next.config.ts                    # 보안 응답 헤더 (5.7)
@@ -435,7 +446,7 @@ ExtractionResult = {
 - 실패 판정(10분 규칙), 실패 원인 → 문구 매핑(8절 표).
 - Claude 호출은 모두 테스트 모드 fixture로 대체한다. 실제 API를 부르는 단위 테스트는 두지 않는다.
 
-### 9.2 화면 테스트 (Cypress 16)
+### 9.2 화면 테스트 (Cypress)
 - 실행: 로컬(`npx cypress run`)과 GitHub Actions(PR마다, `cypress-io/github-action`).
 - 대상 서버: 로컬 `next dev`를 `SLIPSCAN_TEST_MODE=1`로 띄운다. Claude는 fixture, Blob 다운로드는 건너뜀. Blob 업로드 요청은 `cy.intercept`로 가짜 URL을 돌려준다. 가짜 URL은 우리 스토어 호스트 + 브라우저가 만든 경로 그대로여야 `blobUrl` 검증(5.1)을 통과한다. 토큰 발급 요청은 가로채지 않는다(사용량이 실제로 기록되어야 한다).
 - fixture 3개(`lib/claude/fixtures/`): `receipt-ok`(영수증, 거래 1건), `fail-api`(SDK 오류를 던짐 → "분석 서비스가 일시적으로 응답하지 않습니다."), `report-ok`(5개 섹션 보고서 스트림). 업로드한 `fileName`으로 고른다(예: `fail-api.jpg` → `fail-api`). 맞는 이름이 없으면 `receipt-ok`.
@@ -470,7 +481,7 @@ ExtractionResult = {
 
 - Vercel 프로젝트 1개(Hobby). GitHub `main` 머지 시 자동 배포. PR은 프리뷰 배포. 하네스 실행기(`scripts/execute.py`)는 배포에 관여하지 않는다.
 - 리전: 앱 서버(Vercel 함수), Blob 스토어 `slipscan-files`, Neon `slipscan-demo`·`slipscan-test`를 모두 싱가포르 `sin1`에 둔다(ADR-28). 함수 리전은 `vercel.json`이 아니라 Vercel 프로젝트 설정(Settings → Functions → Function Regions)에 `sin1`로 저장되어 있다. Blob과 Neon은 이미 `sin1`에 만들어져 있고 리전을 바꿀 수 없다.
-- step 0 체크리스트: Vercel 프로젝트의 Framework Preset을 Next.js로, Node를 22로 맞춘다(`.nvmrc`와 일치). Vercel 환경변수는 2026-09-17에 10절 이름으로 교체를 마쳤다(v1 흔적 없음. step에서 다시 하지 않는다).
+- 배포 전 체크리스트(사용자): Vercel 프로젝트의 Framework Preset을 Next.js로, Node를 22로 맞춘다(`.nvmrc`와 일치). Vercel 환경변수는 2026-09-17에 10절 이름으로 교체를 마쳤다(v1 흔적 없음. step에서 다시 하지 않는다).
 - Clerk: 개발 인스턴스(로컬·테스트)와 운영 인스턴스(Vercel) 분리. 운영 인스턴스는 Restricted 모드, 이메일/비밀번호만, 사용자 계정 삭제 기능 끔(13절).
 - Neon: 시연용 프로젝트 1개, 테스트용 프로젝트 1개.
 - 시연 계정: 관리자(프로젝트 소유자)가 Clerk 대시보드에서 직접 만든다. 비밀번호는 무작위로 넣고 기록하지 않는다. 초대 절차가 필요 없다. 만든 뒤 `userId`를 `DEMO_USER_ID` 환경변수에 넣는다. 포트폴리오에는 주소만 게시한다(아이디·비밀번호 없음).
@@ -499,7 +510,7 @@ ExtractionResult = {
 | ADR-8 | 추출은 구조화 출력 + zod 이중 검증 | 자유 텍스트 파싱 | 형식 깨짐 방지 |
 | ADR-9 | 초대는 Clerk 대시보드에서 보낸다. 앱 안에 초대 화면·API·관리자 역할 없음 | 앱 안 초대 관리 화면, Clerk allowlist, 자체 테이블 | allowlist는 유료. 초대는 무료이며 메일까지 Clerk이 보낸다. 대시보드에서 보내면 코드 0줄이고 시연 여정에 초대 화면이 나오지 않는다. 2026-09-17 개정 |
 | ADR-10 | HEIC 미지원. 이미지는 `sharp` 한 줄로 분석용 사본(회전 반영, 긴 변 2576px, JPEG)을 만든다 | 서버 HEIC 변환(`libheif-js` + `sharp`), 브라우저 변환 | HEIC 변환은 라이브러리·Blob 재저장·교체 순서 규칙을 끌고 오는데 시연 여정에 쓰이지 않는다. `sharp`는 Next.js가 이미 쓴다. 2026-09-17 개정 |
-| ADR-11 | 화면 테스트는 Cypress 16 | Playwright(사용자 제외), AI형 | Clerk 헬퍼, 네트워크 가로채기, 무료 CI |
+| ADR-11 | 화면 테스트는 Cypress. 메이저는 `@clerk/testing`의 피어 범위를 따른다(2026-09-18 확인: 13~15. Cypress 16은 범위 밖) | Playwright(사용자 제외), AI형 | Clerk 헬퍼, 네트워크 가로채기, 무료 CI. 2026-09-18 개정 |
 | ADR-12 | 모델은 Opus 5 기본 | Sonnet 5 | 추출 정확도가 시연 성패를 결정. 시연 규모에서 비용 차이 미미. 2026-09-16 v1 비교 후 Sonnet→Opus로 변경 |
 | ADR-13 | 사용량은 `usage_log` 표에서 센다. 업로드 토큰 발급과 보고서 시작 때 1행 | `documents`+`reports` 행 수로 계산(이전 결정), 별도 카운터 | 행 수 방식은 문서를 지우면 사용량이 환불되고, 토큰만 받아 가는 업로드가 잡히지 않아 비용 상한이 무너진다. 표 하나로 둘 다 막는다. 동시성 초과는 감수. 2026-09-17 개정 |
 | ADR-14 | 원본은 공개 주소(추측 불가)로 저장 | 비공개 + 서명 URL | MVP 범위. 2단계 보안 목록 |
@@ -532,3 +543,20 @@ ExtractionResult = {
 - `@anthropic-ai/sdk`에서 구조화 출력(`output_config.format`)을 `messages.stream()`과 함께 쓰는 법, 최종 메시지에서 JSON을 꺼내는 헬퍼, `stop_reason`의 값 목록, PDF 문서 블록 사용법(`claude-api` 스킬의 TypeScript 문서 참조).
 - `react-markdown`에서 링크·이미지 요소를 비허용하는 옵션(`disallowedElements` 등)과 raw HTML이 기본으로 무시되는지.
 - `sharp().rotate()`가 EXIF 회전을 반영하는지와 Vercel 함수에서의 메모리·시간.
+
+### 13.1 확인 결과 (2026-09-18, 공식 문서·npm 조사)
+
+위 목록을 조사한 결과다. **설치된 패키지의 타입 정의와 다르면 타입 정의가 우선이다.** "미확인"이라고 적힌 것은 해당 step에서 직접 확인한다.
+
+- 버전(npm): next 16.3.5, react 19.3.0, typescript 7.0.2, tailwindcss 4.3.3, shadcn CLI 4.21.0, eslint 10.10.0, vitest 5.0.1, @clerk/nextjs 7.9.4, @clerk/localizations 4.17.1, @clerk/testing 2.2.36, cypress 16.1.0, @vercel/blob 2.8.0, @anthropic-ai/sdk 0.126.0, zod 4.6.5, drizzle-orm 0.45.2, drizzle-kit 0.31.10, @neondatabase/serverless 1.1.0, pdf-lib 1.17.1, sharp 0.35.4, react-markdown 10.1.0.
+- `create-next-app`은 허용 목록 밖 파일(`AGENTS.md`, `CLAUDE.md`, `scripts/`, `phases/` 등)이 있는 폴더에서 실행을 거부한다. 임시 폴더에 만든 뒤 옮긴다.
+- Next 16: `proxy.ts`는 Node 런타임에서 돈다. `next build`는 lint를 하지 않는다. lint는 flat config(`eslint.config.mjs`) + `eslint .`이다. `after`는 `next/server`에서 가져오고 `maxDuration` 안에서 돈다.
+- shadcn CLI v4는 프리셋 방식으로 바뀌었다. 플래그는 `npx shadcn@latest init --help`로 확인한다. Tailwind v4에서는 `:root`에 값을 두고 `@theme inline { --color-<이름>: var(--<이름>); }`로 유틸리티를 등록한다. `.dark` 블록은 만들지 않는다.
+- Clerk: `clerkMiddleware`는 `proxy.ts`에서 그대로 동작한다. **`auth.protect()`는 API 요청에 404를 준다.** `/api/**`의 401 JSON은 `const { userId } = await auth()`로 직접 검사해 돌려준다. `clerkClient`는 함수다(`const client = await clerkClient()`). sign-in token은 `client.signInTokens.createSignInToken({ userId, expiresInSeconds })`의 `.token`이다. 로그인 주소와 이동 주소는 `<ClerkProvider signInUrl signInFallbackRedirectUrl>` 속성으로 준다(환경변수를 늘리지 않는다). 한국어는 `@clerk/localizations`의 `koKR`이다. **미확인**: `<SignIn />`이 `?__clerk_ticket=`을 자동으로 소비하는지, sign-in token이 무료 플랜·초대 전용 모드에서 되는지. 수동 소비의 최신 API는 `signIn.ticket({ ticket })` 뒤 `signIn.finalize(...)`다. Clerk 대시보드에서 Restricted 모드는 "Invite-only"로 표기될 수 있다. 계정 삭제 끄기는 User & authentication → User permissions의 "Allow users to delete their accounts"다.
+- `@clerk/testing`: `clerkSetup({ config })`, `addClerkCommands({ Cypress, cy })`, `cy.clerkSignIn({ strategy: 'password', identifier, password })`. 피어 범위가 Cypress 13~15라 **Cypress 16을 쓰지 않는다**(ADR-11).
+- Vercel Blob: 브라우저 `upload(pathname, file, { access: 'public', handleUploadUrl, onUploadProgress })`, 진행 이벤트는 `{ loaded, total, percentage }`다. 서버 `handleUpload`의 `onBeforeGenerateToken(pathname, clientPayload, multipart)`은 `allowedContentTypes`, `maximumSizeInBytes`, `addRandomSuffix`(기본 false), `allowOverwrite`(기본 false)를 돌려주고, 거절은 throw다. `onUploadCompleted`는 localhost로 호출되지 않으므로 빈 함수로 둔다(5.1). 공개 URL은 `https://<storeId>.public.blob.vercel-storage.com/<pathname>`이다. 토큰은 `vercel_blob_rw_<storeId>_<secret>` 모양으로 알려져 있으나 공식 계약이 아니다. 스토어 호스트는 실제 `put` 1회의 결과와 대조해 확인한다. `put`·`upload`·`copy`·`list`는 고급 작업이고 `del`은 아니다.
+- Anthropic SDK: `client.messages.stream({ …, output_config: { format: zodOutputFormat(schema), effort: 'low' } })`. `zodOutputFormat`은 `@anthropic-ai/sdk/helpers/zod`에 있다. `const final = await stream.finalMessage()`의 `final.parsed_output`·`final.stop_reason`·`final.usage`를 쓴다. `stop_reason` 값은 `end_turn`, `max_tokens`, `stop_sequence`, `tool_use`, `pause_turn`, `refusal`이다. 구조화 출력의 JSON 스키마는 `maxLength`·`minimum` 등을 지원하지 않는다(가맹점명 100자는 받은 뒤 zod로 검사). `thinking`은 보내지 않는다(기본이 adaptive). PDF는 `document` 블록(base64, 텍스트 블록 앞), 이미지는 `image` 블록이다. 클라이언트는 `new Anthropic({ maxRetries: 0, timeout: 240_000 })`(밀리초). 오류 클래스는 `BadRequestError`(400), `RateLimitError`(429), `APIConnectionTimeoutError`, `APIConnectionError`, `APIError`(`.status`)다. 보고서 글 조각은 스트림 이벤트 `content_block_delta`의 `text_delta`다.
+- pdf-lib: 암호 PDF는 `PDFDocument.load`가 `EncryptedPDFError`(export됨)를 던진다. `ignoreEncryption`은 쓰지 않는다. 2021년 이후 새 판이 없어 버전을 고정한다.
+- sharp: 인자 없는 `.rotate()`가 EXIF 방향을 반영한다. 빌드에서 묶기 문제가 나면 `serverExternalPackages: ['sharp']`.
+- react-markdown: raw HTML은 기본으로 무시된다. `disallowedElements={['a','img']}`와 `unwrapDisallowed`를 함께 쓴다(링크 글자는 남는다). 표는 GFM 플러그인이 있어야 그려지므로 보고서 프롬프트가 표를 쓰지 않게 하고 플러그인은 설치하지 않는다.
+- Drizzle + Neon: `Pool`(`@neondatabase/serverless`) + `drizzle({ client: pool })`(`drizzle-orm/neon-serverless`), `db.transaction(async (tx) => …)`. 마이그레이션은 `drizzle-kit generate` → `migrate`다(`push`는 쓰지 않는다). Node 22의 전역 WebSocket으로 트랜잭션이 되는지는 테스트 DB로 확인하고, 안 되면 `ws`를 지정한다.
