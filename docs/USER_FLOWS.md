@@ -7,7 +7,7 @@
 | 짝 문서 | `docs/PRD.md`(무엇을 만드는가), `docs/ARCHITECTURE.md`(어떻게 만드는가). 이 문서는 **누가, 어떤 순서로, 무엇을 보며, 어긋나면 어떻게 되는가** |
 | 상태 | 확정. 구현 전. 이 브랜치의 설계 기준(SOT). 본문의 `[G-n]`은 8.1 결정 번호 참조 |
 | 쓰임 | `design.md`(화면 설계)의 입력, Cypress 시나리오의 출처, 하네스 step 설계의 근거 |
-| 개정 | v2.1: 리뷰 반영. 결정 항목을 갈림길 있는 10개로 압축, MVP 원칙에 어긋나는 장치(cron 재시드, 스트림 끊김 감지, 목록 상한 등) 컷, 문구 통일<br/>2026-09-17: v1 브랜치 대조 결과 반영(UC-07, J5, 8.5, 8.6, 9.4 step 메모)<br/>2026-09-17 (2차): 세 모델(Claude·Codex·Grok) 교차 리뷰 반영. 시연 5분 여정(J1) 기준으로 범위 축소, 결함 수정(사용량 기록, 업로드 경로 검증, 트랜잭션, stop_reason, 날짜·시간대 등)<br/>2026-09-17 (3차): 디자인 시스템 반영(`docs/design.md`). 테마를 라이트 전용으로(4절, UC-21), 9.2 수동 확인에서 다크 모드 배지 삭제 |
+| 개정 | v2.1: 리뷰 반영. 결정 항목을 갈림길 있는 10개로 압축, MVP 원칙에 어긋나는 장치(cron 재시드, 스트림 끊김 감지, 목록 상한 등) 컷, 문구 통일<br/>2026-09-17: v1 브랜치 대조 결과 반영(UC-07, J5, 8.5, 8.6, 9.4 step 메모)<br/>2026-09-17 (2차): 세 모델(Claude·Codex·Grok) 교차 리뷰 반영. 시연 5분 여정(J1) 기준으로 범위 축소, 결함 수정(사용량 기록, 업로드 경로 검증, 트랜잭션, stop_reason, 날짜·시간대 등)<br/>2026-09-17 (3차): 디자인 시스템 반영(`docs/design.md`). 테마를 라이트 전용으로(4절, UC-21), 9.2 수동 확인에서 다크 모드 배지 삭제<br/>2026-09-18: 9.4를 확정된 3묶음 step 목록으로 교체(`phases/`가 실제 지시) |
 
 기능 범위·제한값(하루 50회, 10분, 10MB, 20페이지, 4초 폴링)의 출처는 PRD 7절이다. 이 문서는 값을 인용만 하고 규칙을 새로 만들지 않는다.
 
@@ -599,27 +599,24 @@ C1·C3·C8은 결번(2026-09-17 컷).
 | `report-ok` | 보고서 스트림 텍스트(5개 섹션, 20조각으로 나눠 전송) | 1 |
 | 사용량 50 | fixture가 아니라 시드: 테스트 계정에 오늘 날짜 `usage_log` 50행 | 3 |
 
-### 9.4 하네스 step 순서 (C단계 초안의 뼈대)
+### 9.4 하네스 step 순서 (3묶음, 2026-09-18 확정)
 
-각 step이 끝나면 J1의 어느 단계까지 통하는지로 순서를 잡았다. 실제 step 파일은 사용자가 구현 계획을 지시하면 harness 워크플로우 C·D에 따라 만든다.
+2026-09-18에 세 묶음(phase)으로 확정했다. 실제 지시는 `phases/{묶음}/step{N}.md`에 있고 이 표는 그 목록이다. 실행기는 step 하나를 세션 하나(30분 제한)로 돌리므로 step 하나가 모듈 하나만 다루게 잘게 나눴다. 묶음이 끝날 때마다 PR과 화면 확인을 거친다.
 
-| 순서 | step 이름 | 덮는 UC | 끝나면 J1에서 통하는 단계 | 관련 G |
-|---|---|---|---|---|
-| 0 | `project-setup` | — | — (빌드·테스트 뼈대) | — |
-| 1 | `schema-and-categories` | UC-09 데이터 형태 | — | G-8 |
-| 2 | `auth-and-routing` | UC-01, UC-03, 4절 | 1~2 (랜딩·시연 로그인·리다이렉트) | G-4 |
-| 3 | `upload-and-documents-api` | UC-05~08, UC-10, UC-12 | 5~6 (업로드·처리 중·완료·실패·삭제) | G-1, G-7, G-9 |
-| 4 | `extraction-pipeline` | UC-09, UC-11 | 7 (추출 결과·중복 배지) | G-10 |
-| 5 | `stats` | UC-04, UC-13, UC-17 | 3, 8 (대시보드 API·통계·사용량·폴링) | G-3 |
-| 6 | `reports-streaming` | UC-15, UC-16 | 9~10 (보고서 생성·열람·복사) | G-5 |
-| 7 | `demo-seed-and-samples` | UC-19 | 3~4 (채워진 대시보드, 중복 시드) | G-2 |
-| 8 | `e2e-cypress` | 9.2 전체 | 리허설 9.1의 자동화 가능한 부분 | — |
+| 묶음 | step (번호는 묶음 안에서 0부터) | 덮는 UC | 끝나면 J1에서 통하는 단계 |
+|---|---|---|---|
+| `0-foundation` | 0 `project-setup` · 1 `shared-constants` · 2 `db-schema` · 3 `design-system` · 4 `auth-and-routing` · 5 `landing-and-shell` | UC-01, UC-03, UC-04 V1, UC-21, UC-22, 4절 | 1~2 (랜딩·시연 로그인·빈 대시보드) |
+| `1-documents` | 0 `date-and-stats-lib` · 1 `usage-and-validate-lib` · 2 `claude-schemas-and-fixtures` · 3 `seed-data` · 4 `sample-images` · 5 `pipeline-parts` · 6 `claude-extract` · 7 `process-document` · 8 `upload-api` · 9 `documents-dashboard-api` · 10 `dashboard-list-ui` · 11 `upload-ui` · 12 `stats-ui` · 13 `document-detail-ui` | UC-04~13, UC-17, UC-20 | 3~8 (업로드·처리 중·완료·실패·상세·중복·통계·삭제) |
+| `2-reports-demo` | 0 `report-lib` · 1 `reports-api` · 2 `report-generate-ui` · 3 `report-pages-ui` · 4 `demo-seed` · 5 `e2e-setup` · 6 `e2e-scenarios` | UC-15, UC-16, UC-19, 9.2 전체 | 9~10 + 채워진 시연 계정 + Cypress 3개 |
 
-선행 관계: 3은 2가, 4는 1·3이, 5·6은 4가, 7은 4·6이 먼저다.
+선행 관계: 묶음은 순서대로 develop에 병합한 뒤 다음 묶음을 실행한다. 묶음 안의 step은 번호 순서다.
 
-step 메모. step 파일을 쓸 때 해당 step의 "작업"이나 "금지사항"에 옮긴다.
-- step 0 `project-setup`: 패키지 메이저 버전을 고정한다(v1 리뷰에서 vitest 미고정이 Node 버전 충돌로 이어짐). Node 22를 `engines`와 `.nvmrc`에 적고, Vercel 프로젝트의 Framework Preset이 Next.js, Node가 22인지 확인한다. 디렉토리는 ARCH 4절대로 루트 `app/`(`src/` 없음). Tailwind 버전은 shadcn/ui 현재 요구에 맞춘다. `.env.example`은 ARCH 10절의 이름 8개만(값 없음). `next.config.ts`에 보안 응답 헤더(ARCH 5.7).
-- step 1 `schema-and-categories`: DB 클라이언트는 트랜잭션이 되는 드라이버로 만든다(ARCH 5.1).
-- step 2 `auth-and-routing`: sign-in token 미확인은 `blocked` 사유가 아니다. 확인에 실패하면 시연 계정의 이메일+비밀번호 로그인으로 AC를 통과시키고 보고한다.
-- step 3 `upload-and-documents-api`: 업로드 경로·`blobUrl` 검증과 `usage_log` 점유(ARCH 5.1)를 테스트 먼저 쓴다.
-- step 4 `extraction-pipeline`: sharp 한 줄(회전·긴 변 2576px·JPEG)을 모든 이미지에 적용한다(ARCH 5.1).
+사용자 준비물: `2-reports-demo`의 `demo-seed` 전에 시연 계정과 `DEMO_USER_ID`, `e2e-setup` 전에 Clerk 개발 인스턴스의 테스트 계정(`cypress.env.json`)이 있어야 한다. 없으면 그 step은 `blocked`로 멈춘다.
+
+step 메모(2026-09-17 v1 대조에서 나온 것. 해당 step 파일에 옮겼다).
+- `project-setup`: 패키지 메이저 버전을 고정한다(v1 리뷰에서 vitest 미고정이 Node 버전 충돌로 이어짐). Node 22를 `engines`와 `.nvmrc`에 적는다. 디렉토리는 ARCH 4절대로 루트 `app/`(`src/` 없음). `.env.example`은 ARCH 10절의 이름 8개만(값 없음). `next.config.ts`에 보안 응답 헤더(ARCH 5.7). Vercel 프로젝트의 Framework Preset(Next.js)과 Node 22 확인은 사용자가 배포 전에 한다.
+- `db-schema`: DB 클라이언트는 트랜잭션이 되는 드라이버로 만든다(ARCH 5.1).
+- `auth-and-routing`: sign-in token 미확인은 `blocked` 사유가 아니다. 이 step의 AC는 실제 로그인 성공을 요구하지 않는다. 확인한 것과 못 한 것을 summary에 적는다. 시연 계정의 비밀번호 로그인은 만들지 않는다(ADR-19: 비밀번호는 아무도 모른다). 실제 입장은 사용자가 리허설(9.1의 2번)에서 확인한다.
+- `usage-and-validate-lib`·`upload-api`: 업로드 경로·`blobUrl` 검증과 `usage_log` 점유(ARCH 5.1)를 테스트 먼저 쓴다.
+- `pipeline-parts`: sharp 한 줄(회전·긴 변 2576px·JPEG)을 모든 이미지에 적용한다(ARCH 5.1).
+- `claude-extract`·`report-lib`: 실제 Claude 호출 확인(ARCH 9.3)을 이 step의 AC에 1~2회 넣는다. 단위 테스트는 실제 호출을 하지 않는다.
