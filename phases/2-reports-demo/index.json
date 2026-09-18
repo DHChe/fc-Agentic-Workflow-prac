@@ -29,7 +29,10 @@
     {
       "step": 3,
       "name": "report-pages-ui",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T23:16:28+0900",
+      "summary": "ReportList(reloadKey)와 ReportDetailPage(params)를 구현해 API 전용 목록·완료 상세·마크다운 원문 복사를 제공하고, 목록은 첫 마운트와 reloadKey 변경 때만 다시 읽도록 app/dashboard/page.tsx에 연결함; report-list·report-row·report-copy data-testid를 추가했으며 MESSAGES.ui 새 문장은 추가하지 않음",
+      "completed_at": "2026-09-18T23:20:48+0900"
     },
     {
       "step": 4,

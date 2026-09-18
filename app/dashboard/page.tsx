@@ -1,6 +1,5 @@
 "use client";
 
-import { FileText } from "lucide-react";
 import { useCallback, useState } from "react";
 
 import { useDashboardData } from "@/components/dashboard/dashboard-data";
@@ -10,9 +9,9 @@ import {
   ReportStreamArea,
   useReportGeneration,
 } from "@/components/dashboard/report-generator";
+import { ReportList } from "@/components/dashboard/report-list";
 import { StatsPanel } from "@/components/dashboard/stats-panel";
 import { UploadPanel } from "@/components/dashboard/upload-panel";
-import { EmptyState } from "@/components/empty-state";
 import { Section } from "@/components/section";
 import { MESSAGES } from "@/lib/messages";
 
@@ -56,12 +55,9 @@ export default function DashboardPage(): React.JSX.Element {
         <DocumentList />
       </Section>
 
-      <Section
-        key={reportsReloadKey}
-        title={MESSAGES.ui.section.reports}
-      >
+      <Section title={MESSAGES.ui.section.reports}>
         <ReportStreamArea state={state} />
-        <EmptyState icon={FileText} text={MESSAGES.empty.reports} />
+        <ReportList reloadKey={reportsReloadKey} />
       </Section>
     </>
   );
