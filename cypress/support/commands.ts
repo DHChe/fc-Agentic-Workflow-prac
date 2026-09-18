@@ -1,7 +1,4 @@
-import {
-  addClerkCommands,
-  setupClerkTestingToken,
-} from "@clerk/testing/cypress";
+import { addClerkCommands } from "@clerk/testing/cypress";
 
 addClerkCommands({ Cypress, cy });
 
@@ -42,14 +39,18 @@ Cypress.Commands.add("signInAsTestUser", () => {
   const identifier = requiredEnv("E2E_USER_EMAIL");
   const password = requiredEnv("E2E_USER_PASSWORD");
 
-  setupClerkTestingToken();
-  cy.visit("/sign-in");
+  cy.visit("/");
   cy.clerkLoaded();
   cy.clerkSignIn({ strategy: "password", identifier, password });
   cy.window().should((window) => {
+    if (window.Clerk.client?.signIn.status === "needs_client_trust") {
+      throw new Error(
+        "Clerk Device Trust must be disabled for the development E2E instance",
+      );
+    }
+
     expect(window.Clerk.session).not.to.equal(null);
   });
-  cy.getCookie("__session").should("exist");
   cy.visit("/dashboard");
 });
 

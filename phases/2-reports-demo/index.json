@@ -45,9 +45,9 @@
     {
       "step": 5,
       "name": "e2e-setup",
-      "status": "error",
+      "status": "blocked",
       "started_at": "2026-09-18T23:30:02+0900",
-      "error_message": "npm run e2e:limit에서 @clerk/testing의 cy.clerkSignIn이 오류 없이 반환했지만 window.Clerk.session이 null로 남아 /dashboard 인증에 실패함. 세션 대기, /sign-in 선방문, setupClerkTestingToken 선등록까지 3회 수정 후에도 동일하게 재현됨"
+      "blocked_reason": "Clerk 개발(Development) 인스턴스의 Protect → Device Trust가 활성화되어 @clerk/testing의 password 로그인이 needs_client_trust에서 중단됩니다. Device Trust를 비활성화한 뒤 다시 실행해 주세요."
     },
     {
       "step": 6,
