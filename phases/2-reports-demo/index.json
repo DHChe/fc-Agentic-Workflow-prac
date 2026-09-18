@@ -45,9 +45,10 @@
     {
       "step": 5,
       "name": "e2e-setup",
-      "status": "blocked",
+      "status": "completed",
       "started_at": "2026-09-18T23:30:02+0900",
-      "blocked_reason": "Clerk 개발(Development) 인스턴스의 Protect → Device Trust가 활성화되어 @clerk/testing의 password 로그인이 needs_client_trust에서 중단됩니다. Device Trust를 비활성화한 뒤 다시 실행해 주세요."
+      "summary": "Cypress 15 환경과 resetUser·fillUsage task, signInAsTestUser·interceptBlobUpload 명령을 구성하고 PUT https://vercel.com/api/blob/?pathname=… 요청을 url·downloadUrl·pathname·contentType·contentDisposition·etag 응답으로 가로챔; E2E_USER_EMAIL·E2E_USER_PASSWORD·BLOB_STORE_HOST 환경변수와 e2e·e2e:limit·e2e:open 스크립트를 연결해 한도 도달 시나리오를 통과함",
+      "completed_at": "2026-09-19T00:08:00+0900"
     },
     {
       "step": 6,
