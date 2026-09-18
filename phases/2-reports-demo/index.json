@@ -7,7 +7,8 @@
       "name": "report-lib",
       "status": "completed",
       "started_at": "2026-09-18T22:57:44+0900",
-      "summary": "lib/claude/prompts/report.ts, lib/claude/report.ts, lib/claude/report.test.ts, scripts/try-report.ts에 REPORT_SYSTEM_PROMPT, REPORT_SECTION_TITLES, buildReportInput, streamReport, getReportRows, expireStaleReports를 구현하고 실제 claude-opus-5 호출(입력 1,743토큰·출력 1,630토큰·22.676초)을 검증함"
+      "summary": "lib/claude/prompts/report.ts, lib/claude/report.ts, lib/claude/report.test.ts, scripts/try-report.ts에 REPORT_SYSTEM_PROMPT, REPORT_SECTION_TITLES, buildReportInput, streamReport, getReportRows, expireStaleReports를 구현하고 실제 claude-opus-5 호출(입력 1,743토큰·출력 1,630토큰·22.676초)을 검증함",
+      "completed_at": "2026-09-18T23:04:33+0900"
     },
     {
       "step": 1,
