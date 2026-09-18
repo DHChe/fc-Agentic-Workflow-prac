@@ -1,8 +1,11 @@
+import Anthropic from "@anthropic-ai/sdk";
+
 import { CATEGORY_LABELS, type CategoryKey } from "@/lib/categories";
 import { formatAmount, formatDateTime } from "@/lib/format";
 import { MESSAGES } from "@/lib/messages";
 import {
   aggregateMonth,
+  isValidMonth,
   monthRange,
   seoulDateKey,
 } from "@/lib/stats/aggregate";
@@ -29,6 +32,49 @@ export type ReportRow = {
   category: CategoryKey;
   cardLast4: string | null;
 };
+
+function errorStatus(error: unknown): number | undefined {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "status" in error &&
+    typeof error.status === "number"
+  ) {
+    return error.status;
+  }
+
+  return undefined;
+}
+
+export function parseReportRequest(
+  body: unknown,
+): { month: string } | null {
+  if (typeof body !== "object" || body === null || !("month" in body)) {
+    return null;
+  }
+
+  const { month } = body;
+
+  return typeof month === "string" && isValidMonth(month) ? { month } : null;
+}
+
+export function toReportErrorResponse(
+  error: unknown,
+): { status: 502 | 500; error: string } {
+  const status = errorStatus(error);
+
+  if (
+    error instanceof Anthropic.RateLimitError ||
+    error instanceof Anthropic.APIConnectionError ||
+    error instanceof Anthropic.APIConnectionTimeoutError ||
+    status === 429 ||
+    (status !== undefined && status >= 500)
+  ) {
+    return { status: 502, error: MESSAGES.api.upstream };
+  }
+
+  return { status: 500, error: MESSAGES.api.internal };
+}
 
 type ReportInput = {
   summaryJson: string;

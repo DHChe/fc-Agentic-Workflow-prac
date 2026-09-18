@@ -13,7 +13,9 @@
     {
       "step": 1,
       "name": "reports-api",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T23:04:33+0900",
+      "summary": "app/api/reports/route.ts와 app/api/reports/[id]/route.ts에 보고서 POST·목록 GET·상세 GET을 구현하고, lib/claude/report.ts에 parseReportRequest·toReportErrorResponse를 추가해 X-Report-Id 스트림과 목록 reports[{id, month, createdAt, completedAt}]·상세 {id, month, status, contentMd, modelUsed, createdAt, completedAt} JSON을 제공함"
     },
     {
       "step": 2,

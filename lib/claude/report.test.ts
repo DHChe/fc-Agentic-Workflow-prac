@@ -41,7 +41,7 @@ function reportRow(
   };
 }
 
-function anthropicApiError(status: number): Anthropic.APIError {
+function anthropicApiError(status: number) {
   return Anthropic.APIError.generate(
     status,
     {
