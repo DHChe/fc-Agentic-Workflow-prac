@@ -77,7 +77,10 @@
     {
       "step": 9,
       "name": "documents-dashboard-api",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T20:40:53+0900",
+      "summary": "app/api/dashboard/route.ts와 app/api/documents/[id]/route.ts 생성; lib/stats/document-summary.ts의 summarizeDocument로 completed 문서의 transactionCount·totalAmount 계산; lib/api-types.ts exports: DashboardDocument, DashboardResponse, TransactionItem, DocumentDetailResponse, ApiError(JSON 필드 transactionCount, totalAmount, failureReason, duplicateOfDocumentId 등); 삭제 트랜잭션은 소유 문서 확인 → 거래 id 조회 → 참조 거래 중복 해제 → 거래 삭제 → 문서 삭제 순서이며 이후 Blob del은 best-effort(테스트 모드 생략)",
+      "completed_at": "2026-09-18T20:44:50+0900"
     },
     {
       "step": 10,
