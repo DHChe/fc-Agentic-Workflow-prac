@@ -48,7 +48,7 @@
       "status": "completed",
       "started_at": "2026-09-18T23:30:02+0900",
       "summary": "Cypress 15 환경과 resetUser·fillUsage task, signInAsTestUser·interceptBlobUpload 명령을 구성하고 PUT https://vercel.com/api/blob/?pathname=… 요청을 url·downloadUrl·pathname·contentType·contentDisposition·etag 응답으로 가로챔; E2E_USER_EMAIL·E2E_USER_PASSWORD·BLOB_STORE_HOST 환경변수와 e2e·e2e:limit·e2e:open 스크립트를 연결해 한도 도달 시나리오를 통과함",
-      "completed_at": "2026-09-19T00:08:00+0900"
+      "completed_at": "2026-09-19T00:08:15+0900"
     },
     {
       "step": 6,
