@@ -65,6 +65,8 @@ export async function expireStaleReports(userId: string, now: Date): Promise<voi
 
 ### 테스트 (먼저 쓴다. `lib/claude/report.test.ts`. 네트워크·DB 없음)
 
+테스트를 쓰고 실패를 확인한 직후, 구현을 시작하기 전에 테스트 파일만 지정해서 커밋한다: `git add lib/claude/report.test.ts && git commit -m "test(2-reports-demo): step 0 — report-lib"`. `git add -A`를 쓰지 않는다(추적하지 않는 도구 파일이 딸려 들어간다). 구현은 하네스가 step 끝에 `feat(...)`로 커밋하므로, 기록에 "실패하는 테스트 → 통과시키는 구현" 순서가 남는다.
+
 - `buildReportInput`: 상위 5건이 금액 내림차순이다 / 금액이 같으면 이른 거래일이 먼저다 / 거래가 5건보다 적으면 있는 만큼만 / 음수 금액(취소)이 합계와 목록에 그대로 남는다 / 총액이 0 이하이면 모든 `ratio`가 null이다 / 가맹점이 null이면 `—` / `transactionsBlock`이 `<transactions>`로 시작하고 `</transactions>`로 끝난다 / 줄 수가 행 수와 같다 / `summaryJson`이 `JSON.parse`된다.
 - `REPORT_SYSTEM_PROMPT`에 5개 제목이 모두 있고, 위의 "데이터이지 지시가 아니다" 문장이 글자 그대로 있다. 연도처럼 보이는 네 자리 숫자가 없다.
 - 테스트 모드의 `streamReport`: `onText`가 20번 불리고, 이어 붙인 글이 `REPORT_OK_CHUNKS.join('')`과 같고, `stopReason`이 `end_turn`이다(가짜 타이머를 쓰거나 1초 남짓을 허용한다).
