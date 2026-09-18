@@ -112,7 +112,7 @@
       "status": "completed",
       "started_at": "2026-09-18T21:03:34+0900",
       "summary": "components/documents/badges.ts·badges.test.ts·transaction-table.tsx, components/ui/alert-dialog.tsx, app/dashboard/documents/[id]/page.tsx 생성; badgesFor는 components/documents/badges.ts에서 dateEstimated → duplicate → amountMissing 순으로 반환; data-testid: document-status-badge, document-delete, document-failure-reason, transaction-row; 클라이언트 page에서 use(params)로 params Promise를 해제; MESSAGES.ui 추가 키 없음",
-      "completed_at": "2026-09-18T21:08:35+0900"
+      "completed_at": "2026-09-18T21:09:26+0900"
     }
   ],
   "created_at": "2026-09-18T19:48:29+0900"
