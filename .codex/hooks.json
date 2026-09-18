@@ -1,0 +1,28 @@
+{
+  "description": "SlipScan 프로젝트 훅. .claude/settings.json의 프로젝트 고유 훅(위험 명령 차단, 종료 시 검증)을 옮긴 것. graft 훅은 전역 ~/.codex/hooks.json에 있으므로 여기 두지 않는다.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if jq -r '.tool_input.command // empty' | grep -qE 'rm\\s+-rf|git\\s+push\\s+--force|git\\s+reset\\s+--hard|DROP\\s+TABLE'; then echo 'BLOCKED: 위험한 명령어가 감지되었습니다.' >&2; exit 2; fi",
+            "statusMessage": "위험 명령 검사"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh \"$(git rev-parse --show-toplevel)/.codex/hooks/stop_verify.sh\"",
+            "statusMessage": "lint · build · test"
+          }
+        ]
+      }
+    ]
+  }
+}
