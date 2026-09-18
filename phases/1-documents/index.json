@@ -29,7 +29,9 @@
     {
       "step": 3,
       "name": "seed-data",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T20:05:23+0900",
+      "summary": "scripts/seed-data.ts exports: SeedTransaction, SeedDocument, SEED_DOCUMENTS, SAMPLE_RECEIPT; 고정 시드 문서 10건·거래 14건, 2026년 8월 거래 합계 787,900원"
     },
     {
       "step": 4,
