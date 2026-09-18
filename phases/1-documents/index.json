@@ -13,7 +13,9 @@
     {
       "step": 1,
       "name": "usage-and-validate-lib",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-09-18T19:54:08+0900",
+      "summary": "lib/usage/limit.ts exports: DAILY_LIMIT, usageWindow, countTodayUsage, recordUsage, claimUpload; lib/upload/validate.ts exports: MAX_FILE_BYTES, ALLOWED_CONTENT_TYPES, UploadExt, PathCheck, validateUploadPath, validateBlobUrl, getBlobStoreHost, mimeFromExt, extFromContentType, checkClientFile. getBlobStoreHost는 BLOB_READ_WRITE_TOKEN의 네 번째 조각을 소문자 storeId로 사용하며 실제 Blob put URL과 비교해 host ok를 확인했다. 문서 삭제 후에도 사용량이 유지되는 규칙은 usage_log만 import하는 소스 검사로 구조 보장했고 실제 동작은 USER_FLOWS 9.1 리허설 10번에서 확인한다."
     },
     {
       "step": 2,
