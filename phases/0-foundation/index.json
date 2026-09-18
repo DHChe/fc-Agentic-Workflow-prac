@@ -23,7 +23,8 @@
       "name": "db-schema",
       "status": "completed",
       "started_at": "2026-09-18T18:51:17+0900",
-      "summary": "documents·transactions·reports·usageLog와 DocType·DocumentStatus·ReportStatus·UsageKind를 내보내는 Drizzle 스키마, lazy Neon Pool의 getDb·Db·Tx, 0000_chubby_marvel_boy.sql 마이그레이션, db:generate·db:migrate 스크립트, 롤백 스모크 도구를 구성하고 테스트 DB(ep-round-bar-b3fcvekm-pooler.c-4.ap-southeast-1.aws.neon.tech)에 적용함(Node 22 전역 WebSocket으로 동작해 ws 불필요)"
+      "summary": "documents·transactions·reports·usageLog와 DocType·DocumentStatus·ReportStatus·UsageKind를 내보내는 Drizzle 스키마, lazy Neon Pool의 getDb·Db·Tx, 0000_chubby_marvel_boy.sql 마이그레이션, db:generate·db:migrate 스크립트, 롤백 스모크 도구를 구성하고 테스트 DB(ep-round-bar-b3fcvekm-pooler.c-4.ap-southeast-1.aws.neon.tech)에 적용함(Node 22 전역 WebSocket으로 동작해 ws 불필요)",
+      "completed_at": "2026-09-18T18:57:21+0900"
     },
     {
       "step": 3,
