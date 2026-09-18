@@ -15,7 +15,8 @@
       "name": "shared-constants",
       "status": "completed",
       "started_at": "2026-09-18T18:47:29+0900",
-      "summary": "MESSAGES·FailureCode, CATEGORY_KEYS·CategoryKey·CATEGORY_LABELS, formatAmount·formatRatio·formatMonthLabel·formatDateTime·formatDate를 추가하고 MESSAGES.ui에 section·uploadPrompt·uploadLimits·uploadDone·documentType·documentColumn·transactionColumn·statsColumn·reportColumn·documentTotal·documentTotalDescription·statsDescription·transactionCount·modelUsed·dashboard·delete·cancel·open·dashboardLink·pageNotFound·copied·reportGenerating 키를 구성함"
+      "summary": "MESSAGES·FailureCode, CATEGORY_KEYS·CategoryKey·CATEGORY_LABELS, formatAmount·formatRatio·formatMonthLabel·formatDateTime·formatDate를 추가하고 MESSAGES.ui에 section·uploadPrompt·uploadLimits·uploadDone·documentType·documentColumn·transactionColumn·statsColumn·reportColumn·documentTotal·documentTotalDescription·statsDescription·transactionCount·modelUsed·dashboard·delete·cancel·open·dashboardLink·pageNotFound·copied·reportGenerating 키를 구성함",
+      "completed_at": "2026-09-18T18:51:17+0900"
     },
     {
       "step": 2,
