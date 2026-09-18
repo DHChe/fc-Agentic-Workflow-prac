@@ -1,6 +1,7 @@
-import { ChartPie, FileText } from "lucide-react";
+import { FileText } from "lucide-react";
 
 import { DocumentList } from "@/components/dashboard/document-list";
+import { StatsPanel } from "@/components/dashboard/stats-panel";
 import { UploadPanel } from "@/components/dashboard/upload-panel";
 import { EmptyState } from "@/components/empty-state";
 import { Section } from "@/components/section";
@@ -13,9 +14,7 @@ export default function DashboardPage(): React.JSX.Element {
         <UploadPanel />
       </Section>
 
-      <Section title={MESSAGES.ui.section.stats}>
-        <EmptyState icon={ChartPie} text={MESSAGES.empty.stats} />
-      </Section>
+      <StatsPanel />
 
       <Section title={MESSAGES.ui.section.documents}>
         <DocumentList />
