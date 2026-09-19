@@ -1,10 +1,5 @@
-const REPORT_SECTION_TITLES = [
-  "1. 기간 총 지출액과 거래 건수",
-  "2. 카테고리별 금액·비율",
-  "3. 큰 지출 상위 5건",
-  "4. 눈에 띄는 점",
-  "5. 한 문단 총평",
-];
+import { REPORT_SECTION_TITLES } from "@/lib/claude/report-sections";
+import { MESSAGES } from "@/lib/messages";
 
 describe("영수증 업로드와 월간 보고서", () => {
   const userId = Cypress.env("E2E_USER_ID") as string;
@@ -52,7 +47,11 @@ describe("영수증 업로드와 월간 보고서", () => {
     );
     cy.get('[data-testid="report-status"]', { timeout: 20_000 }).should(
       "contain.text",
-      "보고서가 저장되었습니다.",
+      MESSAGES.report.saved,
+    );
+    cy.get('[data-testid="report-stream"]').should(
+      "not.contain.text",
+      MESSAGES.ui.reportGenerating,
     );
     cy.get('[data-testid="report-row"]', { timeout: 20_000 }).should(
       "have.length",
