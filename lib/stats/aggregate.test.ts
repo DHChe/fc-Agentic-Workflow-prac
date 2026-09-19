@@ -102,6 +102,17 @@ describe("거래 시각 파싱", () => {
     expect(result.dateEstimated).toBe(false);
   });
 
+  it.each([
+    ["2026-09-09 12:24", "2026-09-09T03:24:00.000Z"],
+    ["2026-09-03 12:41:00", "2026-09-03T03:41:00.000Z"],
+    ["2026-09-03 12:41:00+09:00", "2026-09-03T03:41:00.000Z"],
+  ])("T 대신 공백으로 구분한 %s도 같은 시각으로 읽는다", (raw, expected) => {
+    const result = parseTransactedAt(raw, uploadedAt);
+
+    expect(result.transactedAt.toISOString()).toBe(expected);
+    expect(result.dateEstimated).toBe(false);
+  });
+
   it("미래 날짜를 코드에서 보정하지 않는다", () => {
     const result = parseTransactedAt("2099-01-02", uploadedAt);
 

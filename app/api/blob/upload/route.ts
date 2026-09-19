@@ -1,5 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
-import { handleUpload } from "@vercel/blob/client";
+import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 
 import { MESSAGES } from "@/lib/messages";
 import { decideUploadToken } from "@/lib/upload/rules";
@@ -32,8 +32,15 @@ function requireAllowed(
 }
 
 export async function POST(request: Request): Promise<Response> {
+  let body: HandleUploadBody;
+
   try {
-    const body = await request.json();
+    body = await request.json();
+  } catch {
+    return Response.json({ error: MESSAGES.api.badRequest }, { status: 400 });
+  }
+
+  try {
     const result = await handleUpload({
       body,
       request,
