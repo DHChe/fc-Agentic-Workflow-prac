@@ -206,8 +206,9 @@ sequenceDiagram
   R->>D: usage_log 1행 (kind=report), reports 행 생성 (status=generating)
   R->>D: 월 집계 (총액, 건수, 카테고리별, 상위 5건) + 거래 목록
   R->>L: messages.stream (시스템 프롬프트 + 집계 JSON + 거래 목록)
-  R-->>U: 응답 헤더 X-Report-Id
-  L-->>R: 텍스트 조각
+  L-->>R: 첫 텍스트 조각
+  R-->>U: 응답 헤더 X-Report-Id + 첫 텍스트 조각 (스트리밍 응답)
+  L-->>R: 나머지 텍스트 조각
   R-->>U: 텍스트 조각 (스트리밍 응답)
   R->>D: stop_reason이 end_turn이면 content_md 저장, status=completed
   R-->>U: 스트림 닫기 (DB 저장 뒤)
@@ -219,7 +220,7 @@ sequenceDiagram
 - **숫자는 코드가 계산하고 Claude는 글만 쓴다.** 총액·비율·상위 5건은 SQL로 구해서 입력에 넣는다. Claude에게 덧셈을 시키지 않는다.
 - 중복 표시 거래와 금액 미인식 거래는 집계와 입력에서 제외한다.
 - 요청 순서: 로그인 → `month` 형식 → 그 달 집계 대상 거래 ≥ 1건 → 사용량 < 50 → `usage_log` 1행(kind='report') → `reports` 행(`generating`) → 스트리밍. 여기까지의 오류(스트림 시작 전)는 HTTP 코드 + `{ error }`로 알린다(8절).
-- 스트리밍 응답은 일반 텍스트이고 응답 헤더 **`X-Report-Id`**로 보고서 id를 먼저 준다. 조각마다 형식을 입히는 규약(NDJSON 등)은 두지 않는다.
+- 스트리밍 응답은 일반 텍스트이고 응답 헤더 **`X-Report-Id`**로 보고서 id를 준다. 조각마다 형식을 입히는 규약(NDJSON 등)은 두지 않는다. 헤더는 **첫 조각을 받은 뒤** 나간다: 글이 한 글자도 오기 전의 실패는 HTTP 코드 + `{ error }`로 알려야 하는데(USER_FLOWS.md 7.5), 헤더를 먼저 보내면 상태 코드가 이미 200으로 굳는다. NDJSON을 두지 않기로 한 이상(ADR-26) 첫 조각까지 기다리는 것 말고는 두 규칙을 같이 지킬 방법이 없다.
 - `stop_reason === 'end_turn'`일 때만 `content_md`를 저장하고 `completed`로 바꾼다. **DB 저장을 마친 뒤 스트림을 닫는다.** 잘린 글(`max_tokens` 등)을 완료로 저장하지 않는다.
 - 브라우저는 스트림이 끝나면 `GET /api/reports/[id]`의 `status`로 판정한다. `completed`면 "보고서가 저장되었습니다.", 아니면 "보고서 생성이 중단되었습니다. 다시 시도해 주세요."(USER_FLOWS.md 7.5).
 - 완성 전에 화면을 떠나면 **저장을 보장하지 않는다**(서버가 끝까지 받으면 남을 수 있다). `generating` 상태로 10분 넘게 남은 행은 조회 시 `abandoned`로 바꾼다. 목록(`GET /api/reports`)은 `completed`만 돌려주므로 `generating`·`abandoned`는 사용자 눈에 보이지 않는다. 끊김을 즉시 감지하는 장치는 두지 않는다.
