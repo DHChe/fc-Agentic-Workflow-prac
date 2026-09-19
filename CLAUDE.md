@@ -4,7 +4,7 @@
 
 ## 기술 스택
 - Next.js 16 (App Router, 루트 `app/`, `src/` 없음. 라우트 가드는 `proxy.ts`), TypeScript strict
-- Tailwind CSS + shadcn/ui (라이트 전용. 색·글꼴·부품은 `docs/design.md`, 금지 목록은 `docs/UI_GUIDE.md`)
+- Tailwind CSS + shadcn/ui (라이트 전용. 색·글꼴·부품은 `docs/design.md`, 금지 목록은 `docs/UI_GUIDE.md`, 배치 원칙과 화면 점검표는 `docs/UX_GUIDE.md`)
 - Clerk (`@clerk/nextjs`, Restricted 모드, 이메일+비밀번호)
 - Neon Postgres + Drizzle ORM (`@neondatabase/serverless` Pool + `drizzle-orm/neon-serverless`)
 - Vercel Blob (브라우저 직접 업로드), Vercel Hobby 배포
