@@ -1,5 +1,6 @@
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 
+import { CATEGORY_KEYS } from "@/lib/categories";
 import type { FailureCode } from "@/lib/messages";
 
 import { getClaudeClient, getModel, isTestMode } from "./client";
@@ -15,6 +16,7 @@ import {
 } from "./schemas";
 
 const TEST_FIXTURE_DELAY_MS = 1_500;
+const CATEGORY_KEY_SET: ReadonlySet<string> = new Set(CATEGORY_KEYS);
 
 export type ExtractInput =
   | { kind: "image"; jpeg: Buffer }
@@ -42,6 +44,35 @@ type FinalMessage = {
   content: ReadonlyArray<{ type: string; text?: string }>;
 };
 
+// 구조화 출력의 JSON 스키마는 enum을 강제하지 못한다(13.1: SDK가 description으로 내린다).
+// 목록 밖 카테고리 하나 때문에 문서 전체를 실패시키지 않고 PRD F4의 "모르면 기타"를 따라
+// zod 검증 전에 바꾼다. docType은 세 값뿐이고 틀리면 분류 자체가 무의미하므로 그대로 둔다.
+function fallbackUnknownCategories(payload: unknown): unknown {
+  if (
+    typeof payload !== "object" ||
+    payload === null ||
+    !("transactions" in payload) ||
+    !Array.isArray(payload.transactions)
+  ) {
+    return payload;
+  }
+
+  return {
+    ...payload,
+    transactions: payload.transactions.map((transaction: unknown) => {
+      if (typeof transaction !== "object" || transaction === null) {
+        return transaction;
+      }
+
+      const { category } = transaction as { category?: unknown };
+
+      return typeof category === "string" && CATEGORY_KEY_SET.has(category)
+        ? transaction
+        : { ...transaction, category: "other" };
+    }),
+  };
+}
+
 export function readExtraction(final: FinalMessage): ExtractionResult {
   const stopFailure = checkStopReason(final.stop_reason);
   if (stopFailure !== null) {
@@ -61,7 +92,7 @@ export function readExtraction(final: FinalMessage): ExtractionResult {
     throw new ExtractionError("unparsable");
   }
 
-  const parsed = extractionSchema.safeParse(payload);
+  const parsed = extractionSchema.safeParse(fallbackUnknownCategories(payload));
   if (!parsed.success) {
     throw new ExtractionError("unparsable");
   }

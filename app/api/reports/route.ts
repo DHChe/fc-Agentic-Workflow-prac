@@ -9,6 +9,7 @@ import {
   expireStaleReports,
   getReportRows,
   parseReportRequest,
+  shouldSaveReport,
   streamReport,
   toReportErrorResponse,
 } from "@/lib/claude/report";
@@ -140,7 +141,7 @@ export async function POST(request: Request): Promise<Response> {
           throw new EmptyReportStreamError("Report stream ended without text");
         }
 
-        if (result.stopReason === "end_turn") {
+        if (shouldSaveReport(result.stopReason)) {
           await db
             .update(reports)
             .set({

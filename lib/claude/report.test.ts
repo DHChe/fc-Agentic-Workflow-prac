@@ -9,6 +9,7 @@ import {
   REPORT_SECTION_TITLES,
   buildReportInput,
   parseReportRequest,
+  shouldSaveReport,
   streamReport,
   toReportErrorResponse,
   type ReportRow,
@@ -110,6 +111,24 @@ describe("toReportErrorResponse", () => {
   );
 });
 
+describe("shouldSaveReport", () => {
+  it("end_turn이면 저장한다", () => {
+    expect(shouldSaveReport("end_turn")).toBe(true);
+  });
+
+  it.each([
+    "max_tokens",
+    "refusal",
+    "stop_sequence",
+    "tool_use",
+    "pause_turn",
+    null,
+    undefined,
+  ])("%s면 저장하지 않는다", (stopReason) => {
+    expect(shouldSaveReport(stopReason)).toBe(false);
+  });
+});
+
 describe("buildReportInput", () => {
   it("상위 5건을 금액 내림차순, 동액이면 이른 거래일 순으로 만든다", () => {
     const rows = [
@@ -205,7 +224,7 @@ describe("buildReportInput", () => {
       month: string;
       total: number;
       count: number;
-      categories: Array<{ key: string; label: string; amount: number; ratio: number | null }>;
+      categories: Array<{ key: string; label: string; amount: number; ratio: string }>;
     };
 
     expect(summary.month).toBe("2026-08");
@@ -215,24 +234,28 @@ describe("buildReportInput", () => {
       key: "office_equipment",
       label: "사무·소모품·장비",
       amount: -2_000,
-      ratio: -0.25,
+      ratio: "-25.0%",
     });
     expect(input.transactionsBlock).toContain("-2,000원");
   });
 
-  it("총액이 0 이하면 모든 카테고리 비율이 null이다", () => {
+  it("총액이 0 이하면 모든 카테고리 비율이 빈 값 표시다", () => {
     const input = buildReportInput("2026-08", [
       reportRow("2026-08-01T09:00:00+09:00", 1_000, "결제"),
       reportRow("2026-08-02T09:00:00+09:00", -1_000, "취소", "office_equipment"),
     ]);
     const summary = JSON.parse(input.summaryJson) as {
       total: number;
-      categories: Array<{ ratio: number | null }>;
+      categories: Array<{ ratio: string }>;
     };
 
     expect(summary.total).toBe(0);
     expect(summary.categories).toHaveLength(2);
-    expect(summary.categories.every(({ ratio }) => ratio === null)).toBe(true);
+    expect(
+      summary.categories.every(
+        ({ ratio }) => ratio === MESSAGES.label.placeholder,
+      ),
+    ).toBe(true);
   });
 
   it("금액이 0인 카테고리는 요약에서 뺀다", () => {
@@ -244,7 +267,7 @@ describe("buildReportInput", () => {
         key: string;
         label: string;
         amount: number;
-        ratio: number | null;
+        ratio: string;
       }>;
     };
 
@@ -253,7 +276,7 @@ describe("buildReportInput", () => {
         key: "food_welfare",
         label: "식비·복리후생",
         amount: 1_000,
-        ratio: 1,
+        ratio: "100.0%",
       },
     ]);
   });
