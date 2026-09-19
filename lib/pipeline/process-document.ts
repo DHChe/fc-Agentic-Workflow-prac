@@ -195,6 +195,10 @@ export async function processDocument(
   documentId: string,
   opts: { fileName: string },
 ): Promise<void> {
+  // 전제: documentId는 서버가 방금 만든 값이고 호출자는
+  // app/api/documents/route.ts 한 곳뿐이다. 그래서 아래 조회에만
+  // user_id 조건이 없다. 다른 곳에서 부르게 되면 user_id 조건을 먼저 넣어라.
+
   let userId: string | null = null;
   let pageCount: number | null = null;
 
