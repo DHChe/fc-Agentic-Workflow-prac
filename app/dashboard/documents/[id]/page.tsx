@@ -172,7 +172,7 @@ export default function DocumentDetailPage({
 
   const document = state.document;
   const processing = document.status === "processing";
-  const completed = document.status === "completed";
+  const failed = document.status === "failed";
   const imageOriginal = document.originalMime.startsWith("image/");
   const documentType =
     document.docType === "unknown"
@@ -241,7 +241,7 @@ export default function DocumentDetailPage({
             </AlertDialogContent>
           </AlertDialog>
           {processing ? (
-            <p className="text-caption text-muted-foreground">
+            <p className="text-caption text-warn">
               {MESSAGES.remove.processingDisabled}
             </p>
           ) : null}
@@ -264,7 +264,12 @@ export default function DocumentDetailPage({
         </NoticeLine>
       ) : null}
 
-      <div className="grid gap-7 md:grid-cols-[280px_minmax(0,1fr)]">
+      <div
+        className={cn(
+          "grid gap-7",
+          failed ? "md:max-w-[280px]" : "md:grid-cols-[280px_minmax(0,1fr)]",
+        )}
+      >
         <Panel className="min-w-0">
           <Badge data-testid="document-status-badge" tone={document.status}>
             {MESSAGES.label.status[document.status]}
@@ -324,20 +329,23 @@ export default function DocumentDetailPage({
           ) : null}
         </Panel>
 
-        <Panel className="min-w-0">
-          {processing ? (
-            <EmptyState icon={FileText} text={MESSAGES.empty.detailProcessing} />
-          ) : document.transactions.length === 0 ? (
-            completed ? (
+        {failed ? null : (
+          <Panel className="min-w-0">
+            {processing ? (
+              <EmptyState
+                icon={FileText}
+                text={MESSAGES.empty.detailProcessing}
+              />
+            ) : document.transactions.length === 0 ? (
               <EmptyState
                 icon={FileQuestion}
                 text={MESSAGES.empty.detailNoTransactions}
               />
-            ) : null
-          ) : (
-            <TransactionTable transactions={document.transactions} />
-          )}
-        </Panel>
+            ) : (
+              <TransactionTable transactions={document.transactions} />
+            )}
+          </Panel>
+        )}
       </div>
     </div>
   );

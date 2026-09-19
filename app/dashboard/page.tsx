@@ -16,7 +16,7 @@ import { Section } from "@/components/section";
 import { MESSAGES } from "@/lib/messages";
 
 export default function DashboardPage(): React.JSX.Element {
-  const { data, month, limitReached } = useDashboardData();
+  const { data, month, limitReached, pending } = useDashboardData();
   const [reportsReloadKey, setReportsReloadKey] = useState(0);
   const markReportsForReload = useCallback((): void => {
     setReportsReloadKey((current) => current + 1);
@@ -46,6 +46,7 @@ export default function DashboardPage(): React.JSX.Element {
             generating={generating}
             limitReached={limitReached}
             onCreate={createReport}
+            pending={pending}
           />
         }
       />

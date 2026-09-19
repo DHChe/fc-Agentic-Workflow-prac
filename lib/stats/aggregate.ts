@@ -5,7 +5,7 @@ const DAY_MILLISECONDS = 24 * 60 * 60 * 1_000;
 const MONTH_PATTERN = /^\d{4}-(0[1-9]|1[0-2])$/;
 const DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 const DATE_TIME_PATTERN =
-  /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,9}))?)?(Z|[+-]\d{2}:\d{2})?$/i;
+  /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,9}))?)?(Z|[+-]\d{2}:?\d{2})?$/i;
 
 function utcDate(
   year: number,
@@ -268,6 +268,10 @@ export function aggregateMonth(rows: StatRow[]): MonthStats {
   return { total, count, categories };
 }
 
+export function defaultMonthCutoff(now: Date): Date {
+  return new Date(seoulDayStart(now).getTime() + DAY_MILLISECONDS);
+}
+
 export function pickDefaultMonth(
   latestTransactedAt: Date | null,
   now: Date,
@@ -319,9 +323,7 @@ export async function getDefaultMonth(
     import("@/lib/db/client"),
     import("@/lib/db/schema"),
   ]);
-  const tomorrowStart = new Date(
-    seoulDayStart(now).getTime() + DAY_MILLISECONDS,
-  );
+  const cutoff = defaultMonthCutoff(now);
   const [result] = await getDb()
     .select({ latestTransactedAt: max(transactions.transactedAt) })
     .from(transactions)
@@ -330,7 +332,7 @@ export async function getDefaultMonth(
         eq(transactions.userId, userId),
         eq(transactions.isDuplicate, false),
         isNotNull(transactions.totalAmount),
-        lt(transactions.transactedAt, tomorrowStart),
+        lt(transactions.transactedAt, cutoff),
       ),
     );
 

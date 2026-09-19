@@ -23,9 +23,10 @@ const EMPTY_STATS = {
 export function StatsPanel(props: {
   titleAside?: React.ReactNode;
 }): React.JSX.Element {
-  const { data, month, setMonth } = useDashboardData();
-  const stats = data?.stats ?? EMPTY_STATS;
-  const donutCategories = stats.count === 0 ? [] : stats.categories;
+  const { data, month, pending, setMonth } = useDashboardData();
+  // 답을 기다리는 동안에는 0원·빈 상태 대신 "—"를 둔다(pending은 dashboard-data.tsx).
+  const stats = pending ? null : (data?.stats ?? EMPTY_STATS);
+  const donutCategories = !stats || stats.count === 0 ? [] : stats.categories;
 
   function moveMonth(delta: number): void {
     if (month) {
@@ -76,17 +77,19 @@ export function StatsPanel(props: {
           <p
             className={cn(
               "text-amount-lg",
-              stats.total < 0 ? "text-destructive" : "text-strong",
+              stats && stats.total < 0 ? "text-destructive" : "text-strong",
             )}
             data-testid="stats-total"
           >
-            {formatAmount(stats.total)}
+            {stats ? formatAmount(stats.total) : MESSAGES.label.placeholder}
           </p>
           <p
             className="mt-1 whitespace-nowrap text-body text-strong tabular-nums"
             data-testid="stats-count"
           >
-            {MESSAGES.ui.transactionCount(stats.count)}
+            {stats
+              ? MESSAGES.ui.transactionCount(stats.count)
+              : MESSAGES.label.placeholder}
           </p>
           <p className="mt-1 text-caption text-muted-foreground">
             {MESSAGES.ui.statsDescription}
@@ -96,7 +99,7 @@ export function StatsPanel(props: {
           </div>
         </div>
 
-        {stats.count === 0 ? (
+        {!stats ? null : stats.count === 0 ? (
           <EmptyState
             className="min-h-[200px]"
             data-testid="stats-empty"

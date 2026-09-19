@@ -111,13 +111,43 @@ describe("readExtraction", () => {
     );
   });
 
-  it("목록에 없는 카테고리는 해석 실패다", () => {
+  it("목록에 없는 카테고리는 기타로 바꾼다", () => {
     const text = JSON.stringify({
       ...VALID_EXTRACTION,
       transactions: [
-        { ...VALID_EXTRACTION.transactions[0], category: "travel_mileage" },
+        { ...VALID_EXTRACTION.transactions[0], category: "식비·복리후생" },
       ],
     });
+
+    expect(readExtraction(finalMessage("end_turn", text))).toEqual({
+      docType: "receipt",
+      transactions: [
+        {
+          transactedAt: "2026-09-09T12:24:00",
+          merchantName: "파리바게뜨 역삼점",
+          totalAmount: 17_300,
+          cardLast4: "9012",
+          category: "other",
+        },
+      ],
+    });
+  });
+
+  it("목록 안 카테고리는 그대로 둔다", () => {
+    const text = JSON.stringify({
+      ...VALID_EXTRACTION,
+      transactions: [
+        { ...VALID_EXTRACTION.transactions[0], category: "it_telecom" },
+      ],
+    });
+
+    expect(
+      readExtraction(finalMessage("end_turn", text)).transactions[0].category,
+    ).toBe("it_telecom");
+  });
+
+  it("목록에 없는 문서 종류는 해석 실패다", () => {
+    const text = JSON.stringify({ ...VALID_EXTRACTION, docType: "invoice" });
 
     expect(failureCodeOf(finalMessage("end_turn", text))).toBe("unparsable");
   });

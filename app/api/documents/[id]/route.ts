@@ -8,6 +8,7 @@ import { isTestMode } from "@/lib/claude/client";
 import { getDb } from "@/lib/db/client";
 import { documents, transactions } from "@/lib/db/schema";
 import { MESSAGES } from "@/lib/messages";
+import { findDuplicatesToRevert } from "@/lib/pipeline/duplicates";
 import { expireStaleDocuments } from "@/lib/pipeline/process-document";
 import { summarizeDocument } from "@/lib/stats/document-summary";
 
@@ -172,9 +173,13 @@ export async function DELETE(
         const transactionIds = documentTransactions.map(({ id }) => id);
 
         if (transactionIds.length > 0) {
-          await tx
-            .update(transactions)
-            .set({ isDuplicate: false, duplicateOf: null })
+          const markedDuplicates = await tx
+            .select({
+              id: transactions.id,
+              documentId: transactions.documentId,
+              duplicateOf: transactions.duplicateOf,
+            })
+            .from(transactions)
             .where(
               and(
                 eq(transactions.userId, userId),
@@ -182,6 +187,22 @@ export async function DELETE(
                 inArray(transactions.duplicateOf, transactionIds),
               ),
             );
+          const revertIds = findDuplicatesToRevert(
+            { documentId: id, transactionIds },
+            markedDuplicates,
+          );
+
+          if (revertIds.length > 0) {
+            await tx
+              .update(transactions)
+              .set({ isDuplicate: false, duplicateOf: null })
+              .where(
+                and(
+                  eq(transactions.userId, userId),
+                  inArray(transactions.id, revertIds),
+                ),
+              );
+          }
         }
 
         await tx

@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 
 import { CATEGORY_LABELS, type CategoryKey } from "@/lib/categories";
-import { formatAmount, formatDateTime } from "@/lib/format";
+import { formatAmount, formatDateTime, formatRatio } from "@/lib/format";
 import { MESSAGES } from "@/lib/messages";
 import {
   aggregateMonth,
@@ -93,6 +93,8 @@ export function buildReportInput(
     .map((category) => ({
       ...category,
       label: CATEGORY_LABELS[category.key],
+      // 프롬프트가 숫자를 그대로 인용하라고 하므로 화면과 같은 표시 문자열로 넘긴다.
+      ratio: formatRatio(category.ratio),
     }));
   // 아래 거래 목록은 rows의 거래일 오름차순을 그대로 쓰므로 정렬이 원본을 건드리면 안 된다.
   const top5 = [...rows]
@@ -135,6 +137,14 @@ export function buildReportInput(
       "</transactions>",
     ].join("\n"),
   };
+}
+
+// 잘린 반쪽 보고서를 completed로 저장하지 않는다(5.3). end_turn이 아니면 generating으로
+// 남고 expireStaleReports가 abandoned로 바꾼다.
+export function shouldSaveReport(
+  stopReason: string | null | undefined,
+): boolean {
+  return stopReason === "end_turn";
 }
 
 async function waitForNextTestChunk(): Promise<void> {
