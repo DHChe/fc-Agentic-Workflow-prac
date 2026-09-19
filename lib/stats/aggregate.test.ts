@@ -5,6 +5,7 @@ import { CATEGORY_KEYS } from "@/lib/categories";
 import {
   aggregateMonth,
   currentSeoulMonth,
+  defaultMonthCutoff,
   isValidMonth,
   monthRange,
   parseTransactedAt,
@@ -111,6 +112,27 @@ describe("거래 시각 파싱", () => {
 
     expect(result.transactedAt.toISOString()).toBe(expected);
     expect(result.dateEstimated).toBe(false);
+  });
+
+  it("콜론 없는 오프셋도 콜론 있는 오프셋과 같은 순간으로 읽는다", () => {
+    const basic = parseTransactedAt("2026-09-09T12:24:00+0900", uploadedAt);
+    const extended = parseTransactedAt("2026-09-09T12:24:00+09:00", uploadedAt);
+
+    expect(basic.transactedAt.toISOString()).toBe("2026-09-09T03:24:00.000Z");
+    expect(basic.transactedAt.getTime()).toBe(extended.transactedAt.getTime());
+    expect(basic.dateEstimated).toBe(false);
+    expect(extended.dateEstimated).toBe(false);
+  });
+
+  it.each([
+    "2026-09-09T12:24:00+09:0",
+    "2026-09-09T12:24:00+0:900",
+    "2026-09-09T12:24:00+090",
+  ])("오프셋이 망가진 %s는 업로드 시각으로 대체한다", (raw) => {
+    expect(parseTransactedAt(raw, uploadedAt)).toEqual({
+      transactedAt: uploadedAt,
+      dateEstimated: true,
+    });
   });
 
   it("미래 날짜를 코드에서 보정하지 않는다", () => {
@@ -236,5 +258,26 @@ describe("기본 통계 달", () => {
     ).toBe("2026-02");
   });
 
-  // 미래 거래 제외는 이 순수 함수가 아니라 getDefaultMonth의 SQL 조건이 맡는다.
+  // getDefaultMonth는 이 기준 시각에 lt(미만) 조건을 걸어 미래 거래를 제외한다.
+  it("오늘 서울 마지막 순간은 남기고 내일 서울 자정은 자른다", () => {
+    const cutoff = defaultMonthCutoff(new Date("2026-09-19T05:00:00Z"));
+    const todayLastMoment = new Date("2026-09-19T14:59:59.999Z");
+    const tomorrowStart = new Date("2026-09-19T15:00:00Z");
+
+    expect(cutoff.toISOString()).toBe("2026-09-19T15:00:00.000Z");
+    expect(todayLastMoment < cutoff).toBe(true);
+    expect(tomorrowStart < cutoff).toBe(false);
+  });
+
+  it("서울 자정 전후의 기준 시각은 정확히 하루 차이다", () => {
+    const beforeMidnight = defaultMonthCutoff(
+      new Date("2026-09-30T14:59:59Z"),
+    );
+    const atMidnight = defaultMonthCutoff(new Date("2026-09-30T15:00:00Z"));
+
+    expect(beforeMidnight.toISOString()).toBe("2026-09-30T15:00:00.000Z");
+    expect(atMidnight.getTime() - beforeMidnight.getTime()).toBe(
+      24 * 60 * 60 * 1_000,
+    );
+  });
 });
