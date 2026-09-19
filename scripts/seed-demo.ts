@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 import { del, put } from "@vercel/blob";
 import { and, count, eq } from "drizzle-orm";
 
+import { getModel } from "@/lib/claude/client";
 import {
   REPORT_SECTION_TITLES,
   UNKNOWN_MERCHANT,
@@ -23,7 +24,6 @@ import { aggregateMonth, monthRange } from "@/lib/stats/aggregate";
 
 import { SEED_DOCUMENTS } from "./seed-data";
 
-const MODEL = "claude-opus-5";
 const REPORT_ID = "30000000-0000-4000-8000-000000000001";
 const REPORT_MONTH = "2026-08" as const;
 const REPORT_CREATED_AT = new Date("2026-09-01T09:00:00+09:00");
@@ -383,7 +383,7 @@ async function seedDemo(demoUserId: string, databaseUrl: string): Promise<void> 
         originalUrl: uploadedUrls.get(document.id)!,
         originalMime: "image/jpeg",
         pageCount: null,
-        modelUsed: MODEL,
+        modelUsed: getModel(),
         uploadedAt: document.uploadedAt,
         processedAt: document.processedAt,
       })),
@@ -395,7 +395,7 @@ async function seedDemo(demoUserId: string, databaseUrl: string): Promise<void> 
       month: plan.report.month,
       status: "completed",
       contentMd: plan.report.contentMd,
-      modelUsed: MODEL,
+      modelUsed: getModel(),
       createdAt: plan.report.createdAt,
       completedAt: plan.report.completedAt,
     });

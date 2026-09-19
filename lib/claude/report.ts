@@ -14,18 +14,12 @@ import { getClaudeClient, getModel, isTestMode } from "./client";
 import { REPORT_OK_CHUNKS } from "./fixtures";
 import { REPORT_SYSTEM_PROMPT } from "./prompts/report";
 
+export { REPORT_SECTION_TITLES } from "./report-sections";
+
 const TEST_CHUNK_DELAY_MS = 50;
 const STALE_REPORT_MILLISECONDS = 10 * 60 * 1_000;
 
 export const UNKNOWN_MERCHANT = "가맹점 미인식";
-
-export const REPORT_SECTION_TITLES = [
-  "1. 기간 총 지출액과 거래 건수",
-  "2. 카테고리별 금액·비율",
-  "3. 큰 지출 상위 5건",
-  "4. 눈에 띄는 점",
-  "5. 한 문단 총평",
-] as const;
 
 export type ReportRow = {
   transactedAt: Date;
@@ -100,7 +94,10 @@ export function buildReportInput(
       ...category,
       label: CATEGORY_LABELS[category.key],
     }));
+  // 아래 거래 목록은 rows의 거래일 오름차순을 그대로 쓰므로 정렬이 원본을 건드리면 안 된다.
   const top5 = [...rows]
+    // 취소·환불(음수)은 지출이 아니므로 "큰 지출 상위 5건"에서 뺀다. 합계·건수에는 남는다(ADR-20).
+    .filter((row) => row.totalAmount > 0)
     .sort(
       (left, right) =>
         right.totalAmount - left.totalAmount ||
@@ -184,33 +181,46 @@ export async function streamReport(
     ],
   });
   const chunks: string[] = [];
+  // 스트림이 중간에 던져도 usage를 남긴다(7.1 비용 추적). message_delta의 누적 토큰 수는
+  // 해당 없는 항목이 null로 오므로 직접 합치지 않고 SDK가 모아 둔 스냅샷을 받아 쓴다.
+  let usage: Anthropic.Usage | undefined;
+  let stopReason: Anthropic.StopReason | null = null;
 
-  for await (const event of stream) {
-    if (
-      event.type === "content_block_delta" &&
-      event.delta.type === "text_delta"
-    ) {
-      chunks.push(event.delta.text);
-      opts.onText(event.delta.text);
+  stream.on("streamEvent", (_event, snapshot) => {
+    usage = snapshot.usage;
+    stopReason = snapshot.stop_reason;
+  });
+
+  try {
+    for await (const event of stream) {
+      if (
+        event.type === "content_block_delta" &&
+        event.delta.type === "text_delta"
+      ) {
+        chunks.push(event.delta.text);
+        opts.onText(event.delta.text);
+      }
     }
+
+    const final = await stream.finalMessage();
+    usage = final.usage;
+    stopReason = final.stop_reason;
+
+    return {
+      text: chunks.join(""),
+      stopReason,
+      model,
+    };
+  } finally {
+    console.log(
+      JSON.stringify({
+        jobId: opts.jobId,
+        step: "report",
+        stop_reason: stopReason,
+        usage: usage ?? null,
+      }),
+    );
   }
-
-  const final = await stream.finalMessage();
-
-  console.log(
-    JSON.stringify({
-      jobId: opts.jobId,
-      step: "report",
-      stop_reason: final.stop_reason,
-      usage: final.usage,
-    }),
-  );
-
-  return {
-    text: chunks.join(""),
-    stopReason: final.stop_reason,
-    model,
-  };
 }
 
 export async function getReportRows(

@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { eq } from "drizzle-orm";
 
 import { getDb } from "../lib/db/client";
+import { currentSeoulMonth } from "../lib/stats/aggregate";
 import {
   documents,
   reports,
@@ -37,6 +38,42 @@ export async function resetUser(userId: string): Promise<null> {
   });
 
   return null;
+}
+
+/**
+ * 이번 달 집계 대상 거래 1건을 만들고 그 거래가 들어간 달을 돌려준다. 한도 초과 시나리오가
+ * `POST /api/reports`의 "거래 ≥ 1건" 검사를 통과해 429 분기까지 닿게 하려는 용도다(ARCHITECTURE 5.3).
+ * 달을 돌려주는 이유: 스펙이 따로 계산하면 서울 시간 월말 경계에서 다른 달을 요청할 수 있다.
+ */
+export async function seedTransaction(userId: string): Promise<string> {
+  announceTarget(userId);
+
+  const documentId = randomUUID();
+  const now = new Date();
+
+  await getDb().transaction(async (tx) => {
+    await tx.insert(documents).values({
+      id: documentId,
+      userId,
+      docType: "receipt",
+      status: "completed",
+      originalUrl: "https://e2e.invalid/seed.jpg",
+      originalMime: "image/jpeg",
+      uploadedAt: now,
+      processedAt: now,
+    });
+    await tx.insert(transactions).values({
+      id: randomUUID(),
+      documentId,
+      userId,
+      transactedAt: now,
+      merchantName: "한도 확인용 거래",
+      totalAmount: 1_000,
+      category: "food_welfare",
+    });
+  });
+
+  return currentSeoulMonth(now);
 }
 
 export async function fillUsage(userId: string): Promise<null> {

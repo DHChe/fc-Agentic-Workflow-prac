@@ -57,6 +57,9 @@ export async function GET(request: Request, ctx: { params: Promise<{ id: string 
 - **사용량은 생성을 시작할 때 1회 센다.** 그 뒤 실패해도 돌려주지 않는다(PRD F9).
 - 응답 헤더: `Content-Type: text/plain; charset=utf-8`, `Cache-Control: no-store`, `X-Report-Id: <보고서 id>`.
 - **첫 글자 조각이 도착한 뒤에 스트리밍 `Response`를 돌려준다.** 그 전에 `streamReport`가 실패하면 JSON 오류로 응답한다: `toReportErrorResponse(err)`. 글이 한 글자도 없이 스트림이 끝난 경우(거절 등)도 502로 응답한다(보고서에는 거절 전용 문구가 없다. ARCH 8절의 여섯 코드 가운데 502가 유일하게 맞다). 이유: 화면이 "한 글자도 오기 전의 실패"를 HTTP 오류 문구로 보여줘야 한다(UC-15 E4). 이때도 사용량은 그대로이고 `generating` 행은 10분 규칙에 맡긴다. ARCH 5.3의 순서 그림은 헤더를 글 조각보다 먼저 보내는 것처럼 그려져 있지만, 그러면 UC-15 E4의 HTTP 오류를 돌려줄 수 없다. 이 step은 E4와 ARCH 5.3 본문("스트림 시작 전 오류는 HTTP 코드 + `{ error }`")을 따른다.
+
+> **2026-09-19 정정(이슈 #12)**: 위 줄의 "글이 한 글자도 없이 스트림이 끝난 경우도 502" 결정은 **500으로 바꿨다.** `end_turn`인데 본문이 0자인 것은 ARCH 8절 표의 "Claude 429·5xx·타임아웃"이 아니라 "DB·그 외"에 가깝다. 이 분기는 `stop_reason`을 보지 않으므로 거절·`max_tokens`로 본문이 빈 경우도 함께 500이 된다. 거절에는 502 문구("분석 서비스가 일시적으로 응답하지 않습니다.")도 정확하지 않아 — Claude는 응답했고 쓰기를 거부한 것이다 — 원인을 단정하지 않는 500 문구를 쓴다. 구현: `app/api/reports/route.ts`의 `EmptyReportStreamError`.
+
 - `toReportErrorResponse`: `RateLimitError`·상태 코드 429·500 이상·`APIConnectionError`·`APIConnectionTimeoutError` → `{ status: 502, error: MESSAGES.api.upstream }`. 그 외 전부 → `{ status: 500, error: MESSAGES.api.internal }`. **429는 앱의 하루 한도에만 쓴다.** Claude의 429를 429로 전달하지 않는다.
 - 스트림이 끝나면 `stopReason === 'end_turn'`일 때만 `content_md`, `status = 'completed'`, `completed_at`을 저장한다. **DB 저장을 마친 뒤에 `ReadableStream`을 닫는다.** 이유: 화면은 스트림이 끝나자마자 상태를 조회한다(ADR-26). `max_tokens` 등으로 잘린 글은 저장하지 않는다.
 - 글이 오던 중 오류가 나면 스트림을 닫기만 한다. 상태를 쓰지 않는다(화면이 상태 조회로 "중단"을 판정하고, 행은 10분 뒤 `abandoned`가 된다).

@@ -275,9 +275,11 @@ export function ReportStreamArea(props: {
       className="mb-5 border-b border-border-soft pb-5"
       data-testid="report-stream"
     >
-      <h3 className="mb-4 text-h3 text-strong">
-        {MESSAGES.ui.reportGenerating}
-      </h3>
+      {isStreaming ? (
+        <h3 className="mb-4 text-h3 text-strong">
+          {MESSAGES.ui.reportGenerating}
+        </h3>
+      ) : null}
       {props.state.text || isStreaming ? (
         <ReportMarkdown
           markdown={props.state.text}

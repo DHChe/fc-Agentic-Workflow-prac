@@ -1,5 +1,4 @@
-const UPSTREAM_FAILURE_MESSAGE =
-  "분석 서비스가 일시적으로 응답하지 않습니다.";
+import { MESSAGES } from "@/lib/messages";
 
 describe("문서 분석 실패", () => {
   const userId = Cypress.env("E2E_USER_ID") as string;
@@ -26,7 +25,7 @@ describe("문서 분석 실패", () => {
     );
     cy.get('[data-testid="document-failure-reason"]').should(
       "contain.text",
-      UPSTREAM_FAILURE_MESSAGE,
+      MESSAGES.failure.upstream,
     );
     cy.get('[data-testid="usage-counter"]').should("contain.text", "1/50");
   });

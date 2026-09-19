@@ -24,9 +24,10 @@ import {
 
 export const maxDuration = 300;
 
-class EmptyReportStreamError extends Error {
-  readonly status = 502;
-}
+// 본문이 한 글자도 오지 않은 채 스트림이 정상 종료된 경우다(stop_reason과 무관하다).
+// status를 두지 않으므로 8절 표의 "DB·그 외"(500)로 매핑된다. Claude의 429·5xx·타임아웃은
+// 예외가 그대로 올라와 502로 간다.
+class EmptyReportStreamError extends Error {}
 
 function unauthorized(): Response {
   return Response.json(
@@ -84,15 +85,7 @@ export async function POST(request: Request): Promise<Response> {
     }
 
     const reportId = randomUUID();
-    const usageRecorded = await recordUsage({
-      id: randomUUID(),
-      userId,
-      kind: "report",
-    });
-
-    if (!usageRecorded) {
-      throw new Error("Report usage could not be recorded");
-    }
+    await recordUsage({ id: randomUUID(), userId, kind: "report" });
 
     const db = getDb();
     await db.insert(reports).values({
