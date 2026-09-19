@@ -1,0 +1,120 @@
+{
+  "project": "SlipScan",
+  "phase": "1-documents",
+  "steps": [
+    {
+      "step": 0,
+      "name": "date-and-stats-lib",
+      "status": "completed",
+      "started_at": "2026-09-18T19:48:29+0900",
+      "summary": "lib/stats/aggregate.ts와 lib/stats/aggregate.test.ts 생성; exports: seoulDayStart, seoulDateKey, currentSeoulMonth, isValidMonth, monthRange, shiftMonth, parseTransactedAt, StatRow, MonthStats, aggregateMonth, pickDefaultMonth, getMonthStats, getDefaultMonth, countReportableTransactions",
+      "completed_at": "2026-09-18T19:54:07+0900"
+    },
+    {
+      "step": 1,
+      "name": "usage-and-validate-lib",
+      "status": "completed",
+      "started_at": "2026-09-18T19:54:08+0900",
+      "summary": "lib/usage/limit.ts exports: DAILY_LIMIT, usageWindow, countTodayUsage, recordUsage, claimUpload; lib/upload/validate.ts exports: MAX_FILE_BYTES, ALLOWED_CONTENT_TYPES, UploadExt, PathCheck, validateUploadPath, validateBlobUrl, getBlobStoreHost, mimeFromExt, extFromContentType, checkClientFile. getBlobStoreHost는 BLOB_READ_WRITE_TOKEN의 네 번째 조각을 소문자 storeId로 사용하며 실제 Blob put URL과 비교해 host ok를 확인했다. 문서 삭제 후에도 사용량이 유지되는 규칙은 usage_log만 import하는 소스 검사로 구조 보장했고 실제 동작은 USER_FLOWS 9.1 리허설 10번에서 확인한다.",
+      "completed_at": "2026-09-18T19:58:51+0900"
+    },
+    {
+      "step": 2,
+      "name": "claude-schemas-and-fixtures",
+      "status": "completed",
+      "started_at": "2026-09-18T19:58:51+0900",
+      "summary": "lib/claude/schemas.ts exports: extractionSchema, ExtractionResult, cleanCardLast4; lib/claude/client.ts exports: isTestMode, getModel, getClaudeClient; lib/claude/fixtures/index.ts exports: FixtureName, pickFixtureName, RECEIPT_OK, throwFailApi, REPORT_OK_CHUNKS. @anthropic-ai/sdk 0.126.0과 zod 4.6.5 설치; zodOutputFormat이 미지원 제약 키워드를 제외하므로 별도 extractionWireSchema 없음; throwFailApi는 Anthropic.InternalServerError(status 500)를 던짐.",
+      "completed_at": "2026-09-18T20:05:23+0900"
+    },
+    {
+      "step": 3,
+      "name": "seed-data",
+      "status": "completed",
+      "started_at": "2026-09-18T20:05:23+0900",
+      "summary": "scripts/seed-data.ts exports: SeedTransaction, SeedDocument, SEED_DOCUMENTS, SAMPLE_RECEIPT; 고정 시드 문서 10건·거래 14건, 2026년 8월 거래 합계 787,900원",
+      "completed_at": "2026-09-18T20:09:19+0900"
+    },
+    {
+      "step": 4,
+      "name": "sample-images",
+      "status": "completed",
+      "started_at": "2026-09-18T20:09:19+0900",
+      "summary": "scripts/generate-samples.ts와 scripts/seed-assets/01.jpg~10.jpg·statement-check.pdf, public/samples/receipt-sample.jpg 생성; SVG에서 Apple SD Gothic Neo를 우선 지정해 세 대표 JPG의 한글·숫자를 직접 확인; npx tsx scripts/generate-samples.ts로 재생성",
+      "completed_at": "2026-09-18T20:15:14+0900"
+    },
+    {
+      "step": 5,
+      "name": "pipeline-parts",
+      "status": "completed",
+      "started_at": "2026-09-18T20:15:14+0900",
+      "summary": "lib/pipeline/image.ts·pdf.ts·duplicates.ts 생성(exports: toAnalysisJpeg, MAX_PDF_PAGES, inspectPdf, DupCandidate, DupSubject, findDuplicateOf, markDuplicates); qpdf 부재로 EncryptedPDFError stub 테스트, pdf-lib 1.17.1 런타임의 instanceof 불일치는 동일 오류 메시지 판별로 보정; next.config.ts에 serverExternalPackages: ['sharp'] 추가",
+      "completed_at": "2026-09-18T20:22:41+0900"
+    },
+    {
+      "step": 6,
+      "name": "claude-extract",
+      "status": "completed",
+      "started_at": "2026-09-18T20:22:41+0900",
+      "summary": "lib/claude/prompts/extract.ts exports: EXTRACT_SYSTEM_PROMPT, buildExtractUserText; lib/claude/extract.ts exports: ExtractInput, ExtractionError, checkStopReason, extractDocument; scripts/try-extract.ts로 운영 경로 수동 검증. 실제 claude-opus-5 호출: 영수증 4.568초·입력 4,052/출력 90토큰, 명세서 5.448초·입력 3,168/출력 329토큰. SDK 사용법은 확인 결과와 차이 없음. ARCH 9.3 정확도 확인은 사용자가 npx tsx scripts/try-extract.ts <파일>로 직접 실행하고 정확도·토큰을 기록한다.",
+      "completed_at": "2026-09-18T20:28:50+0900"
+    },
+    {
+      "step": 7,
+      "name": "process-document",
+      "status": "completed",
+      "started_at": "2026-09-18T20:28:50+0900",
+      "summary": "lib/pipeline/process-document.ts와 순수 함수 단위 테스트 생성; exports: PROCESSING_TIMEOUT_MS, isTimedOut, toFailureCode, toTransactionRows, expireStaleDocuments, processDocument. 성공 트랜잭션은 processing 재확인 → 기존 거래 삭제 → 새 거래 삽입 → 중복 판정 → completed 갱신 순서이며, step 8의 after()에서 processDocument(documentId, { fileName })를 호출하고 step 9의 조회 API에서 expireStaleDocuments(userId, now)를 호출하면 된다.",
+      "completed_at": "2026-09-18T20:35:46+0900"
+    },
+    {
+      "step": 8,
+      "name": "upload-api",
+      "status": "completed",
+      "started_at": "2026-09-18T20:35:46+0900",
+      "summary": "app/api/blob/upload/route.ts와 app/api/documents/route.ts 생성; lib/upload/rules.ts exports: decideUploadToken, createDocumentBodySchema. @vercel/blob 2.8.0의 handleUpload는 onBeforeGenerateToken 오류를 감싸지 않고 그대로 전파하며, 설치된 타입에서 onUploadCompleted가 선택 사항이라 넘기지 않았다. 확인 문서와 다른 타입 정의는 없었다.",
+      "completed_at": "2026-09-18T20:40:53+0900"
+    },
+    {
+      "step": 9,
+      "name": "documents-dashboard-api",
+      "status": "completed",
+      "started_at": "2026-09-18T20:40:53+0900",
+      "summary": "app/api/dashboard/route.ts와 app/api/documents/[id]/route.ts 생성; lib/stats/document-summary.ts의 summarizeDocument로 completed 문서의 transactionCount·totalAmount 계산; lib/api-types.ts exports: DashboardDocument, DashboardResponse, TransactionItem, DocumentDetailResponse, ApiError(JSON 필드 transactionCount, totalAmount, failureReason, duplicateOfDocumentId 등); 삭제 트랜잭션은 소유 문서 확인 → 거래 id 조회 → 참조 거래 중복 해제 → 거래 삭제 → 문서 삭제 순서이며 이후 Blob del은 best-effort(테스트 모드 생략)",
+      "completed_at": "2026-09-18T20:45:53+0900"
+    },
+    {
+      "step": 10,
+      "name": "dashboard-list-ui",
+      "status": "completed",
+      "started_at": "2026-09-18T20:45:53+0900",
+      "summary": "useDashboardData() 필드: data, month, setMonth, refresh, limitReached, loading; polling.ts exports: POLL_INTERVAL_MS, shouldPoll, nextTickAction; DashboardDataProvider가 헤더와 본문을 감싸고 AppHeader usage 슬롯에 UsageCounter를 전달; data-testid: usage-counter, document-list, document-row, document-status-badge, document-failure-reason 및 document-row의 data-status; app/dashboard/page.tsx의 업로드·통계·보고서 구획은 다음 step 교체를 위해 정적 상태 유지",
+      "completed_at": "2026-09-18T20:52:51+0900"
+    },
+    {
+      "step": 11,
+      "name": "upload-ui",
+      "status": "completed",
+      "started_at": "2026-09-18T20:52:51+0900",
+      "summary": "UploadPanel(props 없음)로 파일 선택·Blob 직접 업로드·문서 생성·샘플 업로드·진행률·실패 후 사용량 재확인을 구현; upload-helpers.ts exports: buildUploadPath, pickUploadError; data-testid: upload-input, upload-submit, upload-sample, upload-error, upload-progress, limit-notice; MESSAGES.ui 추가 없음(기존 uploadPrompt, uploadLimits, uploadDone 사용)",
+      "completed_at": "2026-09-18T20:58:43+0900"
+    },
+    {
+      "step": 12,
+      "name": "stats-ui",
+      "status": "completed",
+      "started_at": "2026-09-18T20:58:43+0900",
+      "summary": "StatsPanel({ titleAside })로 월 이동·총액·건수·도넛·카테고리 표 구현; donutArcs(categories, opts?: { gapDeg?: number }): DonutArc[]; data-testid: stats-month-label, stats-prev, stats-next, stats-total, stats-count, stats-empty; 순수 날짜 함수는 이동하지 않고 lib/stats/aggregate.ts의 shiftMonth를 그대로 사용",
+      "completed_at": "2026-09-18T21:03:34+0900"
+    },
+    {
+      "step": 13,
+      "name": "document-detail-ui",
+      "status": "completed",
+      "started_at": "2026-09-18T21:03:34+0900",
+      "summary": "components/documents/badges.ts·badges.test.ts·transaction-table.tsx, components/ui/alert-dialog.tsx, app/dashboard/documents/[id]/page.tsx 생성; badgesFor는 components/documents/badges.ts에서 dateEstimated → duplicate → amountMissing 순으로 반환; data-testid: document-status-badge, document-delete, document-failure-reason, transaction-row; 클라이언트 page에서 use(params)로 params Promise를 해제; MESSAGES.ui 추가 키 없음",
+      "completed_at": "2026-09-18T21:09:26+0900"
+    }
+  ],
+  "created_at": "2026-09-18T19:48:29+0900",
+  "completed_at": "2026-09-18T21:09:26+0900"
+}

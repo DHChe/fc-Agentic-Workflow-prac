@@ -1,0 +1,64 @@
+{
+  "project": "SlipScan",
+  "phase": "2-reports-demo",
+  "steps": [
+    {
+      "step": 0,
+      "name": "report-lib",
+      "status": "completed",
+      "started_at": "2026-09-18T22:57:44+0900",
+      "summary": "lib/claude/prompts/report.ts, lib/claude/report.ts, lib/claude/report.test.ts, scripts/try-report.ts에 REPORT_SYSTEM_PROMPT, REPORT_SECTION_TITLES, buildReportInput, streamReport, getReportRows, expireStaleReports를 구현하고 실제 claude-opus-5 호출(입력 1,743토큰·출력 1,630토큰·22.676초)을 검증함",
+      "completed_at": "2026-09-18T23:04:33+0900"
+    },
+    {
+      "step": 1,
+      "name": "reports-api",
+      "status": "completed",
+      "started_at": "2026-09-18T23:04:33+0900",
+      "summary": "app/api/reports/route.ts와 app/api/reports/[id]/route.ts에 보고서 POST·목록 GET·상세 GET을 구현하고, lib/claude/report.ts에 parseReportRequest·toReportErrorResponse를 추가해 X-Report-Id 스트림과 목록 reports[{id, month, createdAt, completedAt}]·상세 {id, month, status, contentMd, modelUsed, createdAt, completedAt} JSON을 제공함",
+      "completed_at": "2026-09-18T23:10:13+0900"
+    },
+    {
+      "step": 2,
+      "name": "report-generate-ui",
+      "status": "completed",
+      "started_at": "2026-09-18T23:10:13+0900",
+      "summary": "ReportMarkdown(markdown, streaming), ReportCreateButton(month, count, limitReached, generating, onCreate), ReportStreamArea(state), useReportGeneration(onFinished)과 reportButtonState를 구현하고, 생성 상태와 reportsReloadKey를 app/dashboard/page.tsx에 두어 통계 버튼·보고서 스트림을 연결했으며 report-create·report-stream·report-status testid를 추가함; MESSAGES.ui에는 새 문장을 더하지 않고 기존 reportGenerating·open을 사용함",
+      "completed_at": "2026-09-18T23:16:28+0900"
+    },
+    {
+      "step": 3,
+      "name": "report-pages-ui",
+      "status": "completed",
+      "started_at": "2026-09-18T23:16:28+0900",
+      "summary": "ReportList(reloadKey)와 ReportDetailPage(params)를 구현해 API 전용 목록·완료 상세·마크다운 원문 복사를 제공하고, 목록은 첫 마운트와 reloadKey 변경 때만 다시 읽도록 app/dashboard/page.tsx에 연결함; report-list·report-row·report-copy data-testid를 추가했으며 MESSAGES.ui 새 문장은 추가하지 않음",
+      "completed_at": "2026-09-18T23:21:50+0900"
+    },
+    {
+      "step": 4,
+      "name": "demo-seed",
+      "status": "completed",
+      "started_at": "2026-09-18T23:21:50+0900",
+      "summary": "scripts/seed-demo.ts와 npm run seed:demo로 문서 10건·거래 14건·중복 1건·날짜 추정 1건·2026-08 완료 보고서 1건을 멱등 시드하고, --verify와 --usage-count 읽기 전용 플래그를 제공함; 다른 DB에는 DATABASE_URL·BLOB_READ_WRITE_TOKEN·DEMO_USER_ID만 바꿔 실행함",
+      "completed_at": "2026-09-18T23:30:02+0900"
+    },
+    {
+      "step": 5,
+      "name": "e2e-setup",
+      "status": "completed",
+      "started_at": "2026-09-18T23:30:02+0900",
+      "summary": "Cypress 15 환경과 resetUser·fillUsage task, signInAsTestUser·interceptBlobUpload 명령을 구성하고 PUT https://vercel.com/api/blob/?pathname=… 요청을 url·downloadUrl·pathname·contentType·contentDisposition·etag 응답으로 가로챔; E2E_USER_EMAIL·E2E_USER_PASSWORD·BLOB_STORE_HOST 환경변수와 e2e·e2e:limit·e2e:open 스크립트를 연결해 한도 도달 시나리오를 통과함",
+      "completed_at": "2026-09-19T00:08:15+0900"
+    },
+    {
+      "step": 6,
+      "name": "e2e-scenarios",
+      "status": "completed",
+      "started_at": "2026-09-19T00:08:15+0900",
+      "summary": "cypress/e2e/happy-path.cy.ts·failure.cy.ts·limit.cy.ts 정확히 3개 시나리오와 cypress/fixtures/fail-api.jpg, PR용 .github/workflows/e2e.yml을 구성해 모두 통과함; 앱 코드 수정: 없음; E2E 하네스는 cypress.config.ts·cypress/support/commands.ts·package.json에서 Chrome Blob PUT 인터셉트 안정화와 Clerk cross-spec 세션 재사용을 적용함; GitHub Secrets 등록 필요: DATABASE_URL, NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY, BLOB_READ_WRITE_TOKEN, E2E_USER_EMAIL, E2E_USER_PASSWORD",
+      "completed_at": "2026-09-19T00:28:57+0900"
+    }
+  ],
+  "created_at": "2026-09-18T22:57:44+0900",
+  "completed_at": "2026-09-19T00:28:57+0900"
+}

@@ -4,6 +4,7 @@
 - `/CLAUDE.md`
 - `/docs/ARCHITECTURE.md`
 - `/docs/ADR.md`
+- `/docs/PRD.md` 2절(성공 기준)과 10절(제외·감수 목록). 10절에 있는 기능이나 방어 장치를 만들었으면 CRITICAL 규칙 위반으로 본다
 
 그런 다음 변경된 파일들을 확인하고, 아래 체크리스트로 검증하라:
 
