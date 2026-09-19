@@ -13,8 +13,14 @@ export function reportButtonState(args: {
   count: number;
   limitReached: boolean;
   generating: boolean;
+  pending?: boolean;
 }): { disabled: boolean; reason: string | null } {
   if (args.generating) {
+    return { disabled: true, reason: null };
+  }
+
+  // 아직 그 달의 숫자를 못 받았다. 0건이라고 단언하지 않는다.
+  if (args.pending) {
     return { disabled: true, reason: null };
   }
 
@@ -232,6 +238,7 @@ export function ReportCreateButton(props: {
   count: number;
   limitReached: boolean;
   generating: boolean;
+  pending: boolean;
   onCreate: () => void;
 }): React.JSX.Element {
   const buttonState = reportButtonState(props);
@@ -239,9 +246,7 @@ export function ReportCreateButton(props: {
   return (
     <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
       {buttonState.reason ? (
-        <span className="text-caption text-muted-foreground">
-          {buttonState.reason}
-        </span>
+        <span className="text-caption text-warn">{buttonState.reason}</span>
       ) : null}
       <Button
         data-testid="report-create"

@@ -28,6 +28,17 @@ describe("reportButtonState", () => {
     ).toEqual({ disabled: true, reason: null });
   });
 
+  it("대기 중에는 거래가 없다고 말하지 않는다", () => {
+    expect(
+      reportButtonState({
+        count: 0,
+        generating: false,
+        limitReached: false,
+        pending: true,
+      }),
+    ).toEqual({ disabled: true, reason: null });
+  });
+
   it("prioritizes the limit message over the empty-month message", () => {
     expect(
       reportButtonState({ count: 0, limitReached: true, generating: false }),

@@ -26,6 +26,7 @@ type DashboardDataValue = {
   refresh: () => Promise<DashboardResponse | null>;
   limitReached: boolean;
   loading: boolean;
+  pending: boolean;
 };
 
 const DashboardDataContext = createContext<DashboardDataValue | null>(null);
@@ -159,6 +160,9 @@ export function DashboardDataProvider(props: {
     refresh,
     limitReached: Boolean(data && data.usage.used >= data.usage.limit),
     loading,
+    // 답을 기다리는 동안에는 숫자 자리를 "—"로 둔다. 달을 옮기는 동안
+    // 낡은 달의 숫자가 새 달 이름 아래 남지 않게 하는 조건이기도 하다.
+    pending: loading && (!data || data.month !== month),
   };
 
   return (
