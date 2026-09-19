@@ -70,6 +70,42 @@ export function findDuplicateOf(
   return earliest?.id ?? null;
 }
 
+// 한 원본을 여러 거래가 나눠 가지면 실제 결제가 통계에서 사라진다.
+// 이번 실행에서 이미 원본으로 쓴 거래는 후보에서 뺀다.
+export function findUnusedDuplicateOf(
+  subject: DupSubject,
+  candidates: DupCandidate[],
+  usedOriginalIds: ReadonlySet<string>,
+): string | null {
+  return findDuplicateOf(
+    subject,
+    candidates.filter((candidate) => !usedOriginalIds.has(candidate.id)),
+  );
+}
+
+export type RevertCandidate = {
+  id: string;
+  documentId: string;
+  duplicateOf: string | null;
+};
+
+// 문서를 지우면 그 문서의 거래를 원본으로 삼던 거래는 더 이상 중복이 아니다.
+export function findDuplicatesToRevert(
+  deleted: { documentId: string; transactionIds: string[] },
+  candidates: RevertCandidate[],
+): string[] {
+  const originalIds = new Set(deleted.transactionIds);
+
+  return candidates
+    .filter(
+      (candidate) =>
+        candidate.documentId !== deleted.documentId &&
+        candidate.duplicateOf !== null &&
+        originalIds.has(candidate.duplicateOf),
+    )
+    .map(({ id }) => id);
+}
+
 export async function markDuplicates(
   tx: Tx,
   userId: string,
@@ -94,6 +130,7 @@ export async function markDuplicates(
       ),
     )
     .orderBy(asc(transactions.createdAt), asc(transactions.id));
+  const usedOriginalIds = new Set<string>();
 
   for (const subject of subjects) {
     if (subject.dateEstimated || subject.totalAmount === null) {
@@ -129,7 +166,7 @@ export async function markDuplicates(
       )
       .orderBy(asc(transactions.createdAt), asc(transactions.id));
 
-    const duplicateOf = findDuplicateOf(
+    const duplicateOf = findUnusedDuplicateOf(
       {
         documentId: subject.documentId,
         transactedAt: subject.transactedAt,
@@ -139,11 +176,14 @@ export async function markDuplicates(
         merchantName: subject.merchantName,
       },
       candidates,
+      usedOriginalIds,
     );
 
     if (!duplicateOf) {
       continue;
     }
+
+    usedOriginalIds.add(duplicateOf);
 
     await tx
       .update(transactions)

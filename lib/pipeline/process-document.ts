@@ -20,7 +20,7 @@ import { parseTransactedAt, seoulDateKey } from "@/lib/stats/aggregate";
 
 import { markDuplicates } from "./duplicates";
 import { toAnalysisJpeg } from "./image";
-import { inspectPdf, MAX_PDF_PAGES } from "./pdf";
+import { decidePdfInput, inspectPdf, type PdfFailureCode } from "./pdf";
 
 export const PROCESSING_TIMEOUT_MS = 600_000;
 
@@ -123,6 +123,18 @@ export function toFailureCode(error: unknown): FailureCode {
   }
 
   return "unknown";
+}
+
+// Claude 호출 전 단계(다운로드·PDF 검사·이미지 변환)의 실패를
+// 사용자 문구(MESSAGES.failure)로 이어 줄 실패 코드로 옮긴다.
+export type PipelineCause =
+  | { step: "download" | "downloadStatus" | "readBody" | "image" }
+  | { step: "pdf"; code: PdfFailureCode };
+
+export function toPipelineFailure(cause: PipelineCause): ExtractionError {
+  return new ExtractionError(
+    cause.step === "pdf" ? cause.code : "unreadable",
+  );
 }
 
 export function toTransactionRows(
@@ -230,12 +242,12 @@ export async function processDocument(
       try {
         response = await fetch(document.originalUrl);
       } catch {
-        throw new ExtractionError("unreadable");
+        throw toPipelineFailure({ step: "download" });
       }
 
       if (!response.ok) {
         logPipelineEvent(documentId, "download", response.status);
-        throw new ExtractionError("unreadable");
+        throw toPipelineFailure({ step: "downloadStatus" });
       }
 
       let original: Buffer;
@@ -243,19 +255,16 @@ export async function processDocument(
       try {
         original = Buffer.from(await response.arrayBuffer());
       } catch {
-        throw new ExtractionError("unreadable");
+        throw toPipelineFailure({ step: "readBody" });
       }
 
       if (isPdf(document.originalMime, document.originalUrl)) {
-        const inspection = await inspectPdf(original);
+        const decision = decidePdfInput(await inspectPdf(original));
 
-        if (!inspection.ok) {
-          throw new ExtractionError(inspection.code);
-        }
+        pageCount = decision.pageCount;
 
-        pageCount = inspection.pageCount;
-        if (pageCount > MAX_PDF_PAGES) {
-          throw new ExtractionError("tooManyPages");
+        if (!decision.ok) {
+          throw toPipelineFailure({ step: "pdf", code: decision.code });
         }
 
         input = { kind: "pdf", pdf: original };
@@ -263,7 +272,7 @@ export async function processDocument(
         try {
           input = { kind: "image", jpeg: await toAnalysisJpeg(original) };
         } catch {
-          throw new ExtractionError("unreadable");
+          throw toPipelineFailure({ step: "image" });
         }
       }
     }

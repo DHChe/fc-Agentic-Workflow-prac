@@ -10,6 +10,7 @@ import { MESSAGES, type FailureCode } from "@/lib/messages";
 import {
   isTimedOut,
   toFailureCode,
+  toPipelineFailure,
   toTransactionRows,
 } from "./process-document";
 
@@ -213,5 +214,34 @@ describe("toTransactionRows", () => {
     };
 
     expect(toTransactionRows(result, context)).toEqual([]);
+  });
+});
+
+describe("toPipelineFailure", () => {
+  it.each(["download", "downloadStatus", "readBody", "image"] as const)(
+    "%s 단계의 실패를 파일 읽기 실패 문구로 잇는다",
+    (step) => {
+      const error = toPipelineFailure({ step });
+
+      expect(error).toBeInstanceOf(ExtractionError);
+      expect(toFailureCode(error)).toBe("unreadable");
+      expect(MESSAGES.failure[toFailureCode(error)]).toBe(
+        "파일을 읽을 수 없습니다.",
+      );
+    },
+  );
+
+  it.each([
+    [
+      "encryptedPdf",
+      "암호가 걸린 PDF는 처리할 수 없습니다. 암호를 풀어 저장한 뒤 올려 주세요.",
+    ],
+    ["tooManyPages", "PDF는 20페이지까지 처리할 수 있습니다."],
+    ["unreadable", "파일을 읽을 수 없습니다."],
+  ] as const)("PDF 판정 %s를 그대로 문구로 잇는다", (code, message) => {
+    const error = toPipelineFailure({ step: "pdf", code });
+
+    expect(toFailureCode(error)).toBe(code);
+    expect(MESSAGES.failure[toFailureCode(error)]).toBe(message);
   });
 });
