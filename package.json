@@ -13,6 +13,7 @@
     "seed:demo": "tsx scripts/seed-demo.ts",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck:cypress": "tsc -p cypress --noEmit",
     "test": "vitest run"
   },
   "engines": {

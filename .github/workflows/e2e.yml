@@ -10,10 +10,9 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     env:
+      # lint·타입 검사·단위 테스트·빌드는 Clerk 비밀키와 Blob 토큰을 쓰지 않는다(e2e job에는 둘 다 필요하다).
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
-      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
-      BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -26,6 +25,8 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
+      - name: Cypress type check
+        run: npm run typecheck:cypress
       - name: Unit tests
         run: npm run test
       - name: Production build
